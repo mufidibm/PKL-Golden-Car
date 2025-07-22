@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Spatie\Permission\Models\Permission;
 
 class RoleResource extends Resource
 {
@@ -19,20 +20,28 @@ class RoleResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->label('Nama Role')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('guard_name')
-                    ->default('web')
-                    ->required()
-                    ->maxLength(255),
-            ]);
-    }
+public static function form(Form $form): Form
+{
+    return $form
+        ->schema([
+            Forms\Components\TextInput::make('name')
+                ->label('Nama Role')
+                ->required()
+                ->maxLength(255),
+
+            Forms\Components\TextInput::make('guard_name')
+                ->default('web')
+                ->required()
+                ->maxLength(255),
+
+            Forms\Components\CheckboxList::make('permissions')
+                ->label('Permissions')
+                ->relationship('permissions', 'name') // asalkan relasi 'permissions' ada di model Role
+                ->columns(2)
+                ->searchable(),
+        ]);
+}
+
 
     public static function table(Table $table): Table
     {

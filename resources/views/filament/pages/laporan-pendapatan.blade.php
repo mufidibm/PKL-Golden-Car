@@ -55,7 +55,7 @@
     {{-- Ringkasan --}}
     @php $ringkasan = $this->getRingkasan(); @endphp
     <div class="flex flex-wrap gap-8 mb-2">
-        <div>
+        <div style="margin-right: 40px">
             <div class="text-sm text-gray-500">Total Pendapatan</div>
             <div class="text-2xl font-bold">Rp {{ number_format($ringkasan['totalPendapatan']) }}</div>
         </div>

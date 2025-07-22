@@ -33,14 +33,14 @@ class TransaksiMasukResource extends Resource
         return $form
             ->schema([
                 Select::make('kendaraan_id')
-                    ->label('Kendaraan')
+                    ->label('Nomor Polisi Kendaraan')
                     ->relationship('kendaraan', 'no_polisi')
                     ->required()
                     ->searchable(),
 
                 Select::make('status')
                     ->options([
-                        'menunggu' => 'menunggu',
+                        'menunggu' => 'Menunggu',
                         'sedang dikerjakan' => 'Sedang Dikerjakan',
                         'menunggu sparepart' => 'Menunggu Sparepart',
                         'pemeriksaan akhir' => 'Pemeriksaan Akhir',

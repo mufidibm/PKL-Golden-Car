@@ -21,7 +21,7 @@
 
             @if ($setting && $setting->getFirstMediaUrl('logo'))
                 <img src="{{ $setting->getFirstMediaUrl('logo') }}" alt="Logo"
-                     class="h-10 w-10 rounded-full object-cover">
+                     class="fixed top-0 bottom-0 h-10 w-10 rounded-full object-cover">
             @endif
 
             <h1 class="text-xl font-semibold text-gray-800">
@@ -31,7 +31,7 @@
     </nav>
 
     <main class="container mx-auto px-4">
-        <div class="bg-white rounded shadow p-6">
+        <div class="bg-white m-5 p-5 rounded shadow p-6">
             @yield('content')
         </div>
     </main>

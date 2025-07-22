@@ -29,16 +29,7 @@ class AppServiceProvider extends ServiceProvider
 
         FilamentView::registerRenderHook(
             'panels::topbar.start',
-            fn(): string => '
-        <div class="flex items-center" style="margin-left: 230px; margin-right: 20px; margin-top: 25px; scale: 1.5;">
-            <img 
-                src="' . asset('images/logo.png') . '" 
-                alt="Logo" 
-                class="h-16 w-auto"
-                style="max-height: 56px; min-height: 130px;"
-            >
-        </div>
-    '
+            fn(): string => view('filament.resources.components.topbar-logo')->render()
         );
     }
 }

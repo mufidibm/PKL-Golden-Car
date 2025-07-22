@@ -58,7 +58,15 @@ class PengerjaanServis extends Model
         static::saved(function ($pengerjaan) {
             // Ubah status Transaksi Masuk mengikuti status pengerjaan
             $pengerjaan->transaksi?->update([
-                'status' => $pengerjaan->status === 'Selesai' ? 'selesai' : strtolower($pengerjaan->status),
+                'status' => match ($pengerjaan->status) {
+                    'Menunggu' => 'Menunggu',
+                    'Waiting' => 'Menunggu',
+                    'Sedang Dikerjakan' => 'Sedang Dikerjakan',
+                    'Menunggu Sparepart' => 'Menunggu Sparepart',
+                    'Pemeriksaan Akhir' => 'Pemeriksaan Akhir',
+                    'Selesai' => 'Selesai',
+                    default => 'Menunggu',
+                },
             ]);
         });
     }

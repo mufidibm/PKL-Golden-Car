@@ -19,7 +19,7 @@
     @if ($setting)
         <div style="display: flex; align-items: center; margin-bottom: 24px; border-bottom: 2px solid #333; padding-bottom: 16px;">
             @if ($setting->getFirstMediaUrl('logo'))
-                <img src="{{ $setting->getFirstMediaUrl('logo') }}" alt="Logo" style="height: 60px; width: 60px; object-fit: cover; border-radius: 8px; margin-right: 20px;">
+                <img src="{{ $setting->getFirstMediaUrl('logo') }}" alt="Logo" style="height: 60px; border-radius: 8px; margin-right: 20px;">
             @endif
             <div>
                 <div style="font-size: 1.5em; font-weight: bold;">{{ $setting->nama_bengkel ?? 'Aplikasi Bengkel' }}</div>
@@ -56,6 +56,10 @@
             @endforeach
         </tbody>
     </table>
+    @if ($Pembayaran->biaya_jasa > 0)
+    <p><strong>Biaya Jasa Tambahan:</strong> Rp {{ number_format($Pembayaran->biaya_jasa, 0, ',', '.') }}</p>
+@endif
+
 
     <p class="total">Total: Rp {{ number_format($Pembayaran->total_bayar) }}</p>
     <p class="total">Dibayar: Rp {{ number_format($Pembayaran->dibayar) }}</p>

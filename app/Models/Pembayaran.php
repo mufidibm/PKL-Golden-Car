@@ -16,6 +16,7 @@ class Pembayaran extends Model
         'dibayar',
         'kembalian',
         'kasir_id',
+        'biaya_jasa',
     ];
 
     public function detail()

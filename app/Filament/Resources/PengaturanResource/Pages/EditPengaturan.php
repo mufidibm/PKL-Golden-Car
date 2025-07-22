@@ -8,6 +8,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 
 class EditPengaturan extends EditRecord
 {

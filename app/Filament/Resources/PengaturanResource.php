@@ -5,7 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PengaturanResource\Pages;
 use App\Models\Setting;
 use Filament\Forms;
-use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,7 +13,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 
 
 
@@ -34,14 +33,16 @@ class PengaturanResource extends Resource
             TextInput::make('alamat')->required(),
             TextInput::make('telepon'),
             TextInput::make('email')->email(),
+
             SpatieMediaLibraryFileUpload::make('logo')
                 ->collection('logo')
-                ->disk('public') // atau disk 'media' jika sudah didefinisikan
+                ->disk('public')
+                ->directory('logo') 
                 ->image()
                 ->preserveFilenames()
+                ->imageEditor()
                 ->loadingIndicatorPosition('left')
                 ->panelAspectRatio('1:1'),
-
         ]);
     }
 

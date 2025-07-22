@@ -41,16 +41,30 @@ class PengerjaanSparepartResource extends Resource
 
                 Select::make('barang_id')
                     ->relationship('barang', 'nama_barang')
-                    ->required(),
+                    ->required()
+                    ->reactive(),
 
                 TextInput::make('qty')
                     ->numeric()
                     ->required()
                     ->reactive()
+                    ->label(
+                        fn(callable $get) =>
+                        $get('barang_id')
+                            ? 'Qty (Stok: ' . \App\Models\Barang::find($get('barang_id'))?->stok . ')'
+                            : 'Qty'
+                    )
+                    ->rule(function (callable $get) {
+                        $barang = \App\Models\Barang::find($get('barang_id'));
+                        return $barang
+                            ? 'max:' . $barang->stok
+                            : null;
+                    })
                     ->afterStateUpdated(
                         fn($state, callable $set, callable $get) =>
                         $set('subtotal', $state * $get('harga'))
                     ),
+
 
                 TextInput::make('harga')
                     ->numeric()
@@ -63,7 +77,8 @@ class PengerjaanSparepartResource extends Resource
 
                 TextInput::make('subtotal')
                     ->numeric()
-                    ->disabled(),
+                    ->disabled()
+                    ->dehydrated(true),
             ]);
     }
 
@@ -99,7 +114,7 @@ class PengerjaanSparepartResource extends Resource
             ->filters([
                 SelectFilter::make('barang_id')
                     ->label('Sparepart')
-                    ->relationship('barang', 'nama_barang'), 
+                    ->relationship('barang', 'nama_barang'),
 
 
                 Filter::make('created_at')

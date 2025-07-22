@@ -17,6 +17,7 @@ use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Notifications\Notification;
 
 class PengerjaanServisRelationManager extends RelationManager
 {
@@ -33,7 +34,7 @@ class PengerjaanServisRelationManager extends RelationManager
 
             Select::make('status')
                 ->options([
-                    'Waiting' => 'Waiting',
+                    'Menunggu' => 'Menunggu',
                     'Sedang Dikerjakan' => 'Sedang Dikerjakan',
                     'Menunggu Sparepart' => 'Menunggu Sparepart',
                     'Pemeriksaan Akhir' => 'Pemeriksaan Akhir',
@@ -64,56 +65,86 @@ class PengerjaanServisRelationManager extends RelationManager
                 EditAction::make(),
                 DeleteAction::make(),
                 Action::make('tambah_sparepart')
-                ->label('Tambah Sparepart')
-                ->icon('heroicon-o-plus-circle')
-                ->color('success')
-                ->form([
-                    Repeater::make('items')
-                        ->schema([
-                            Select::make('barang_id')
-                                ->label('Sparepart')
-                                ->options(fn() => Barang::all()->pluck('nama_barang', 'id'))
-                                ->reactive()
-                                ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                    $barang = Barang::find($state);
-                                    $harga = $barang?->harga_jual ?? 0;
-                                    $set('harga', $harga);
-                                    $set('subtotal', $get('qty') * $harga);
-                                })
-                                ->searchable()
-                                ->required(),
+                    ->label('Tambah Sparepart')
+                    ->icon('heroicon-o-plus-circle')
+                    ->color('success')
+                    ->form([
+                        Repeater::make('items')
+                            ->schema([
+                                Select::make('barang_id')
+                                    ->label('Sparepart')
+                                    ->options(fn() => Barang::all()->pluck('nama_barang', 'id'))
+                                    ->reactive()
+                                    ->afterStateUpdated(function ($state, callable $set) {
+                                        $barang = Barang::find($state);
+                                        $harga = $barang?->harga_jual ?? 0;
+                                        $stok = $barang?->stok ?? 0;
+                                        $set('harga', $harga);
+                                        $set('qty', 1);
+                                        $set('subtotal', $harga * 1);
+                                    })
+                                    ->searchable()
+                                    ->required(),
 
-                            TextInput::make('qty')
-                                ->numeric()
-                                ->reactive()
-                                ->afterStateUpdated(fn($state, callable $set, callable $get) =>
-                                    $set('subtotal', $get('harga') * $state)
-                                )
-                                ->required(),
+                                TextInput::make('qty')
+                                    ->label(
+                                        fn(callable $get) =>
+                                        $get('barang_id')
+                                            ? 'Qty (Stok: ' . (Barang::find($get('barang_id'))?->stok ?? 0) . ')'
+                                            : 'Qty'
+                                    )
+                                    ->numeric()
+                                    ->minValue(1)
+                                    ->reactive()
+                                    ->required()
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                        $barang = Barang::find($get('barang_id'));
+                                        $stok = $barang?->stok ?? 0;
+                                        $harga = $get('harga') ?? 0;
 
-                            TextInput::make('harga')->numeric()->disabled()->dehydrated(true),
-                            TextInput::make('subtotal')->numeric()->disabled()->dehydrated(true),
-                        ])
-                        ->columns(4)
-                        ->createItemButtonLabel('Tambah'),
-                ])
-                ->action(function (array $data, $record) {
-                    foreach ($data['items'] as $item) {
-                        $harga = $item['harga'] ?? 0;
-                        $qty = $item['qty'] ?? 0;
-                        $subtotal = $item['subtotal'] ?? ($harga * $qty);
+                                        if ($state > $stok) {
+                                            $set('qty', $stok);
+                                            Notification::make()
+                                                ->title('Stok tidak mencukupi')
+                                                ->body("Qty diubah menjadi $stok karena stok tidak mencukupi.")
+                                                ->warning()
+                                                ->send();
+                                        }
 
-                        PengerjaanSparepart::create([
-                            'pengerjaan_servis_id' => $record->id,
-                            'barang_id' => $item['barang_id'],
-                            'qty' => $qty,
-                            'harga' => $harga,
-                            'subtotal' => $subtotal,
-                        ]);
+                                        $qty = (int) $get('qty') ?: 0;
+                                        $set('subtotal', $harga * $qty);
+                                    }),
 
-                        Barang::find($item['barang_id'])?->decrement('stok', $qty);
-                    }
-                }),
+                                TextInput::make('harga')->numeric()->disabled()->dehydrated(true),
+                                TextInput::make('subtotal')->numeric()->disabled()->dehydrated(true),
+                            ])
+                            ->columns(4)
+                            ->createItemButtonLabel('Tambah'),
+                    ])
+                    ->action(function (array $data, $record) {
+                        foreach ($data['items'] as $item) {
+                            $barang = Barang::find($item['barang_id']);
+
+                            if (! $barang || $barang->stok < $item['qty']) {
+                                Notification::make()
+                                    ->title('Gagal Menambahkan')
+                                    ->body("Stok {$barang->nama_barang} tidak mencukupi.")
+                                    ->danger()
+                                    ->send();
+                                continue;
+                            }
+
+                            PengerjaanSparepart::create([
+                                'pengerjaan_servis_id' => $record->id,
+                                'barang_id' => $item['barang_id'],
+                                'qty' => $item['qty'],
+                                'harga' => $item['harga'],
+                                'subtotal' => $item['subtotal'],
+                            ]);
+
+                            // $barang->decrement('stok', $item['qty']);
+                        }
+                    }),
             ]);
     }
 }
