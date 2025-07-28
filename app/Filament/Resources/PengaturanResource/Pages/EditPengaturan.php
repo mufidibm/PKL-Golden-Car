@@ -28,6 +28,7 @@ protected function getFormSchema(): array
         Textarea::make('alamat')->label('Alamat')->required(),
         TextInput::make('telepon')->label('No. Telepon')->required(),
         TextInput::make('email')->label('Email')->email(),
+        TextInput::make('rekening')->label('Rekening')->required(),
         SpatieMediaLibraryFileUpload::make('logo')
             ->label('Logo')
             ->collection('logo')

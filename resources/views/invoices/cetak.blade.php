@@ -33,6 +33,7 @@
             width: 100%;
             margin: auto;
             font-size: 13px;
+            padding-top: 40px;
         }
         @media print {
             .pengesahan {
@@ -89,6 +90,7 @@
         </div>
         <div style="display: flex; justify-content: space-between; font-size: 13px; position: relative; bottom: -4px; padding: 0 10px; margin: 0;">
             <p style="margin: 0;">{{ $setting->telepon ?? '-' }}</p>
+          
             <p style="margin: 0;">{{ $tanggalFormatted }}</p>
         </div>
         <hr style="border: 0.6px solid black; margin-bottom: 1.3px;">
@@ -256,6 +258,8 @@
         </tbody>
     </table>
     <p style="font-size: 13px">Demikian invoice ini kami sampaikan atas perhatian dan kerjasamanya kami ucapkan, <br>terimakasih.</p>
+        <p style="margin: 0; font-size:13px">No Rekening Kami: {{ $setting->rekening ?? '-' }}</p>    
+
     <div class="pengesahan">
         <div class="sah-kiri">
             <p style="margin: 0;">{{ $tanggalFormatted }} <br>

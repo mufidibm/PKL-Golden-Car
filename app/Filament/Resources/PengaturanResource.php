@@ -33,6 +33,7 @@ class PengaturanResource extends Resource
             TextInput::make('alamat')->required(),
             TextInput::make('telepon'),
             TextInput::make('email')->email(),
+            TextInput::make('rekening')->required(),
 
             SpatieMediaLibraryFileUpload::make('logo')
                 ->collection('logo')
@@ -54,6 +55,7 @@ class PengaturanResource extends Resource
                 Tables\Columns\TextColumn::make('alamat')->label('Alamat'),
                 Tables\Columns\TextColumn::make('telepon')->label('Telepon'),
                 Tables\Columns\TextColumn::make('email')->label('Email'),
+                Tables\Columns\TextColumn::make('rekening')->label('No Rekening'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
