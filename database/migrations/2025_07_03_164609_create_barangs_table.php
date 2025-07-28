@@ -18,8 +18,8 @@ return new class extends Migration
             $table->enum('kategori', ['Sparepart', 'Bahan Paint', 'Bahan non Paint', 'Tools']);
             $table->string('satuan');
             $table->integer('stok')->default(0);
-            $table->integer('harga_beli');
-            $table->integer('harga_jual');
+            $table->integer('harga_beli')->default(0);
+            $table->integer('harga_jual')->default(0);
             $table->text('keterangan')->nullable();
             $table->timestamps();
         });

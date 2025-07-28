@@ -35,6 +35,7 @@ class JasaResource extends Resource
 
                         Forms\Components\Select::make('asuransi_id')
                             ->label('Asuransi')
+                            ->required()
                             ->relationship('asuransi', 'nama')
                             ->searchable()
                             ->preload()

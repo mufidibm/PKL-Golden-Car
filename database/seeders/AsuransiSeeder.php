@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Asuransi;
 
 class AsuransiSeeder extends Seeder
 {
@@ -12,6 +12,8 @@ class AsuransiSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        Asuransi::create([
+            'nama' => 'Pribadi',
+        ]);
     }
 }
