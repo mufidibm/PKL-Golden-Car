@@ -14,6 +14,7 @@ class PengerjaanJasa extends Model
     protected $fillable = [
         'pengerjaan_servis_id',
         'jasa_id',
+        'asuransi_id',
         'qty',
         'harga',
         'subtotal'
@@ -25,13 +26,13 @@ class PengerjaanJasa extends Model
         'subtotal' => 'decimal:2',
     ];
 
-    public function pengerjaanServis()
-    {
-        return $this->belongsTo(PengerjaanServis::class);
-    }
-
     public function jasa()
     {
-        return $this->belongsTo(Jasa::class);
+        return $this->belongsTo(\App\Models\Jasa::class);
+    }
+
+    public function asuransi()
+    {
+        return $this->belongsTo(Asuransi::class);
     }
 }

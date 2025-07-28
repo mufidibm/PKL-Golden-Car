@@ -63,13 +63,6 @@ class PengerjaanServisRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make(),
-                // Tambahkan aksi untuk melihat estimasi
-                // Action::make('lihat_estimasi')
-                //     ->label('Lihat Estimasi')
-                //     ->icon('heroicon-o-document-text')
-                //     ->color('info')
-                //     ->url(fn() => route('transaksi.estimasi', $this->ownerRecord->id))
-                //     ->openUrlInNewTab(),
             ])
             ->actions([
                 EditAction::make(),
@@ -154,20 +147,6 @@ class PengerjaanServisRelationManager extends RelationManager
 
                             // $barang->decrement('stok', $item['qty']);
                         }
-                        
-                        // Notification dengan link estimasi setelah menambah sparepart
-                        Notification::make()
-                            ->title('Sparepart berhasil ditambahkan')
-                            ->body('Klik untuk melihat estimasi terbaru')
-                            ->success()
-                            ->actions([
-                                \Filament\Notifications\Actions\Action::make('lihat_estimasi')
-                                    ->button()
-                                    ->url(route('transaksi.estimasi', $this->ownerRecord->id))
-                                    ->openUrlInNewTab()
-                                    ->label('Lihat Estimasi'),
-                            ])
-                            ->send();
                     }),
 
                 Action::make('tambah_jasa')
@@ -212,29 +191,7 @@ class PengerjaanServisRelationManager extends RelationManager
                                 'subtotal' => $item['subtotal'],
                             ]);
                         }
-                        
-                        // Notification dengan link estimasi setelah menambah jasa
-                        Notification::make()
-                            ->title('Jasa berhasil ditambahkan')
-                            ->body('Klik untuk melihat estimasi terbaru')
-                            ->success()
-                            ->actions([
-                                \Filament\Notifications\Actions\Action::make('lihat_estimasi')
-                                    ->button()
-                                    ->url(route('transaksi.estimasi', $this->ownerRecord->id))
-                                    ->openUrlInNewTab()
-                                    ->label('Lihat Estimasi'),
-                            ])
-                            ->send();
                     }),
-                    
-                // Tambahkan aksi untuk melihat estimasi di setiap row
-                // Action::make('lihat_estimasi')
-                //     ->label('Estimasi')
-                //     ->icon('heroicon-o-document-text')
-                //     ->color('info')
-                //     ->url(fn($record) => route('transaksi.estimasi', $this->ownerRecord->id))
-                //     ->openUrlInNewTab(),
             ]);
     }
 }

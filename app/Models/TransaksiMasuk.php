@@ -36,7 +36,6 @@ class TransaksiMasuk extends Model
     public function pengerjaanServis()
     {
         return $this->hasMany(PengerjaanServis::class);
-        
     }
 
     public function getLabelAttribute()

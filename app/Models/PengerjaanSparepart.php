@@ -11,7 +11,7 @@ class PengerjaanSparepart extends Model
 
     protected $fillable = ['pengerjaan_servis_id', 'barang_id', 'qty', 'harga', 'subtotal'];
 
-    public function pengerjaanServis()
+    public function pengerjaan()
     {
         return $this->belongsTo(PengerjaanServis::class, 'pengerjaan_servis_id');
     }

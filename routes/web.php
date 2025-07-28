@@ -9,10 +9,6 @@ use App\Http\Controllers\EstimateController;
 use App\Http\Controllers\LaporanPembayaranExportController;
 use App\Http\Controllers\LaporanPendapatanExportController;
 use App\Http\Controllers\PengerjaanJasaController;
-use App\Http\Controllers\EstimasiController;
-
-
-Route::get('/transaksi/{transaksi}/estimasi', [EstimasiController::class, 'cetak'])->name('transaksi.estimasi');
 
 /*
 |--------------------------------------------------------------------------
@@ -47,4 +43,5 @@ Route::get('laporan-pendapatan/export-pdf', [LaporanPendapatanExportController::
 
 Route::get('laporan-pembayaran/export-excel', [LaporanPembayaranExportController::class, 'exportExcel'])->name('laporan-pembayaran.export-excel');
 Route::get('laporan-pendapatan/export-excel', [LaporanPendapatanExportController::class, 'exportExcel'])->name('laporan-pendapatan.export-excel');
+
 
