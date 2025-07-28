@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use App\Filament\Widgets\AsuransiTableWidget;
 
 class JasaResource extends Resource
 {
@@ -22,6 +23,7 @@ class JasaResource extends Resource
 
     public static function form(Form $form): Form
     {
+        
         return $form
             ->schema([
                 Forms\Components\Section::make('Informasi Jasa')
@@ -125,4 +127,5 @@ class JasaResource extends Resource
     {
         return static::getModel()::count();
     }
+
 }
