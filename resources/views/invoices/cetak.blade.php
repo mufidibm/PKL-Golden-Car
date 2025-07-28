@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <style>
@@ -7,23 +8,29 @@
             font-family: arial;
             margin: 20px;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
             font-size: 13px;
         }
-        th, td {
+
+        th,
+        td {
             border: 2.5px solid #000;
             padding: 4px;
             text-align: left;
         }
+
         .total {
             font-weight: bold;
         }
+
         .text-right {
             text-align: right;
         }
+
         .pengesahan {
             position: relative;
             top: 30px;
@@ -35,6 +42,7 @@
             font-size: 13px;
             padding-top: 40px;
         }
+
         @media print {
             .pengesahan {
                 page-break-inside: avoid;
@@ -44,10 +52,14 @@
         }
     </style>
 </head>
+
 <body>
     @php
         use Carbon\Carbon;
         use App\Models\Asuransi;
+
+        // Atur locale ke bahasa Indonesia
+        Carbon::setLocale('id');
 
         $jasa = $Pembayaran->detail->where('jenis_item', 'jasa');
         $sparepart = $Pembayaran->detail->where('jenis_item', 'sparepart');
@@ -68,7 +80,7 @@
             $totalSparepart += $item->subtotal;
             if (session('gunakan_ppn_sparepart', false)) {
                 $ppnSparepart += 0.11 * $item->subtotal;
-            }
+        }
         }
 
         $tanggalFormatted = 'Bekasi, ' . Carbon::parse($Pembayaran->created_at)->translatedFormat('d F Y');
@@ -88,9 +100,10 @@
                 <h1 style="font-size: 20px; font-weight: bold; margin: 0;">INVOICE KENDARAAN</h1>
             </div>
         </div>
-        <div style="display: flex; justify-content: space-between; font-size: 13px; position: relative; bottom: -4px; padding: 0 10px; margin: 0;">
+        <div
+             style="display: flex; justify-content: space-between; font-size: 13px; position: relative; bottom: -4px; padding: 0 10px; margin: 0;">
             <p style="margin: 0;">{{ $setting->telepon ?? '-' }}</p>
-          
+
             <p style="margin: 0;">{{ $tanggalFormatted }}</p>
         </div>
         <hr style="border: 0.6px solid black; margin-bottom: 1.3px;">
@@ -160,7 +173,8 @@
             @endforeach
             <tr>
                 <td style="border: none;"></td>
-                <td colspan="2" style="font-weight: bold;">TOTAL</td>
+                <td colspan="2"
+                    style="font-weight: bold;">TOTAL</td>
                 <td class="text-right">
                     <span style="float: left;">Rp</span> {{ number_format($totalJasa) }}
                 </td>
@@ -203,7 +217,8 @@
             <tr>
                 <td style="border: none;"></td>
                 <td style="border: none;"></td>
-                <td colspan="2" style="font-weight: bold;">TOTAL</td>
+                <td colspan="2"
+                    style="font-weight: bold;">TOTAL</td>
                 <td class="text-right">
                     <span style="float: left;">Rp</span> {{ number_format($totalSparepart) }}
                 </td>
@@ -218,7 +233,8 @@
             <tr>
                 <td style="border: none;"></td>
                 <td style="border: none;"></td>
-                <td colspan="2" style="font-weight: bold;">PPN JASA</td>
+                <td colspan="2"
+                    style="font-weight: bold;">PPN JASA</td>
                 <td class="text-right">
                     <span style="float: left;">Rp</span> {{ number_format($ppnJasa) }}
                 </td>
@@ -226,7 +242,8 @@
             <tr>
                 <td style="border: none;"></td>
                 <td style="border: none;"></td>
-                <td colspan="2" style="font-weight: bold;">PPN SPAREPART</td>
+                <td colspan="2"
+                    style="font-weight: bold;">PPN SPAREPART</td>
                 <td class="text-right">
                     <span style="float: left;">Rp</span> {{ number_format($ppnSparepart) }}
                 </td>
@@ -234,7 +251,8 @@
             <tr>
                 <td style="border: none;"></td>
                 <td style="border: none;"></td>
-                <td colspan="2" style="font-weight: bold;">TOTAL BAYAR</td>
+                <td colspan="2"
+                    style="font-weight: bold;">TOTAL BAYAR</td>
                 <td class="text-right">
                     <span style="float: left;">Rp</span> {{ number_format($Pembayaran->total_bayar) }}
                 </td>
@@ -242,7 +260,8 @@
             <tr>
                 <td style="border: none;"></td>
                 <td style="border: none;"></td>
-                <td colspan="2" style="font-weight: bold;">DIBAYAR</td>
+                <td colspan="2"
+                    style="font-weight: bold;">DIBAYAR</td>
                 <td class="text-right">
                     <span style="float: left;">Rp</span> {{ number_format($Pembayaran->dibayar) }}
                 </td>
@@ -250,15 +269,18 @@
             {{-- <tr>
                 <td style="border: none;"></td>
                 <td style="border: none;"></td>
-                <td colspan="2" style="font-weight: bold;">KEMBALIAN</td>
+                <td colspan="2"
+                    style="font-weight: bold;">KEMBALIAN</td>
                 <td class="text-right">
-                    <span style="float: left;">Rp</span> {{ number_format($Pembayaran->dibayar - $Pembayaran->total_bayar) }}
+                    <span style="float: left;">Rp</span> {{ number_format($Pembayaran->dibayar -
+                    $Pembayaran->total_bayar) }}
                 </td>
             </tr> --}}
         </tbody>
     </table>
-    <p style="font-size: 13px">Demikian invoice ini kami sampaikan atas perhatian dan kerjasamanya kami ucapkan, <br>terimakasih.</p>
-        <p style="margin: 0; font-size:13px">No Rekening Kami: {{ $setting->rekening ?? '-' }}</p>    
+    <p style="font-size: 13px">Demikian invoice ini kami sampaikan atas perhatian dan kerjasamanya kami ucapkan,
+        <br>terimakasih.</p>
+    <p style="margin: 0; font-size:13px">No Rekening Kami: {{ $setting->rekening ?? '-' }}</p>
 
     <div class="pengesahan">
         <div class="sah-kiri">
@@ -279,6 +301,7 @@
         </div>
     </div>
 </body>
+
 </html>
 <script>
     window.onload = function () {

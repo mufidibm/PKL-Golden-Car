@@ -33,7 +33,7 @@ class PengaturanResource extends Resource
             TextInput::make('alamat')->required(),
             TextInput::make('telepon'),
             TextInput::make('email')->email(),
-            TextInput::make('rekening')->required(),
+            TextInput::make('rekening'),
 
             SpatieMediaLibraryFileUpload::make('logo')
                 ->collection('logo')

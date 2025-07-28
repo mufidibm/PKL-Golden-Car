@@ -7,6 +7,8 @@ use App\Filament\Resources\PengerjaanServisResource\RelationManagers\PengerjaanS
 use App\Models\PengerjaanServis;
 use App\Models\PengerjaanSparepart;
 use App\Models\Barang;
+use App\Models\PengerjaanJasa;
+use App\Models\Jasa;
 use Filament\Forms;
 use Filament\Forms\Components\{DatePicker, DateTimePicker, Repeater, Select, Textarea, TextInput};
 use Filament\Forms\Form;
@@ -17,6 +19,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\{Filter, SelectFilter};
 use Filament\Tables\Table;
 use App\Models\TransaksiMasuk;
+use Filament\Notifications\Notification;
 
 class PengerjaanServisResource extends Resource
 {
@@ -30,51 +33,50 @@ class PengerjaanServisResource extends Resource
     protected static ?string $pluralLabel = 'Pengerjaan Service';
 
     public static function form(Form $form): Form
-{
-    return $form->schema([
-        Select::make('transaksi_masuk_id')
-            ->label('Transaksi Masuk')
-            ->searchable()
-            ->getSearchResultsUsing(function (string $search) {
-                return TransaksiMasuk::with('kendaraan')
-                    ->whereHas('kendaraan', function ($query) use ($search) {
-                        $query->where('no_polisi', 'like', "%{$search}%");
-                    })
-                    ->get()
-                    ->mapWithKeys(function ($item) {
-                        return [
-                            $item->id => $item->kendaraan->no_polisi . ' - ' . $item->created_at->format('d/m/Y'),
-                        ];
-                    });
-            })
-            ->getOptionLabelUsing(function ($value): ?string {
-                $item = TransaksiMasuk::with('kendaraan')->find($value);
-                return $item ? $item->kendaraan->no_polisi . ' - ' . $item->created_at->format('d/m/Y') : null;
-            })
-            ->required(),
+    {
+        return $form->schema([
+            Select::make('transaksi_masuk_id')
+                ->label('Transaksi Masuk')
+                ->searchable()
+                ->getSearchResultsUsing(function (string $search) {
+                    return TransaksiMasuk::with('kendaraan')
+                        ->whereHas('kendaraan', function ($query) use ($search) {
+                            $query->where('no_polisi', 'like', "%{$search}%");
+                        })
+                        ->get()
+                        ->mapWithKeys(function ($item) {
+                            return [
+                                $item->id => $item->kendaraan->no_polisi . ' - ' . $item->created_at->format('d/m/Y'),
+                            ];
+                        });
+                })
+                ->getOptionLabelUsing(function ($value): ?string {
+                    $item = TransaksiMasuk::with('kendaraan')->find($value);
+                    return $item ? $item->kendaraan->no_polisi . ' - ' . $item->created_at->format('d/m/Y') : null;
+                })
+                ->required(),
 
-        Select::make('mekanik_id')
-            ->label('Mekanik')
-            ->relationship('mekanik', 'nama')
-            ->searchable()
-            ->required(),
+            Select::make('mekanik_id')
+                ->label('Mekanik')
+                ->relationship('mekanik', 'nama')
+                ->searchable()
+                ->required(),
 
-        Select::make('status')
-            ->options([
-                'Waiting' => 'Waiting',
-                'Sedang Dikerjakan' => 'Sedang Dikerjakan',
-                'Menunggu Sparepart' => 'Menunggu Sparepart',
-                'Pemeriksaan Akhir' => 'Pemeriksaan Akhir',
-                'Selesai' => 'Selesai',
-            ])
-            ->required(),
+            Select::make('status')
+                ->options([
+                    'Menunggu' => 'Menunggu',
+                    'Sedang Dikerjakan' => 'Sedang Dikerjakan',
+                    'Menunggu Sparepart' => 'Menunggu Sparepart',
+                    'Pemeriksaan Akhir' => 'Pemeriksaan Akhir',
+                    'Selesai' => 'Selesai',
+                ])
+                ->required(),
 
-        DateTimePicker::make('mulai')->required(),
-        DateTimePicker::make('selesai')->nullable(),
-        TextInput::make('catatan')->label('Catatan')->nullable(),
-    ]);
-}
-
+            DateTimePicker::make('mulai')->required(),
+            DateTimePicker::make('selesai')->nullable(),
+            Textarea::make('catatan')->label('Catatan')->nullable(),
+        ]);
+    }
 
     public static function table(Table $table): Table
     {
@@ -103,7 +105,7 @@ class PengerjaanServisResource extends Resource
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn(string $state) => match ($state) {
-                        'Waiting' => 'gray',
+                        'Menunggu' => 'gray',
                         'Sedang Dikerjakan' => 'warning',
                         'Menunggu Sparepart' => 'danger',
                         'Pemeriksaan Akhir' => 'info',
@@ -112,6 +114,7 @@ class PengerjaanServisResource extends Resource
 
                 TextColumn::make('mulai')->dateTime(),
                 TextColumn::make('selesai')->dateTime(),
+                TextColumn::make('catatan')->limit(20),
                 TextColumn::make('spareparts_sum_subtotal')
                     ->label('Total Biaya Sparepart')
                     ->money('IDR', true)
@@ -122,7 +125,7 @@ class PengerjaanServisResource extends Resource
                 SelectFilter::make('status')
                     ->label('Status Pengerjaan')
                     ->options([
-                        'Waiting' => 'Waiting',
+                        'Menunggu' => 'Menunggu',
                         'Sedang Dikerjakan' => 'Sedang Dikerjakan',
                         'Menunggu Sparepart' => 'Menunggu Sparepart',
                         'Pemeriksaan Akhir' => 'Pemeriksaan Akhir',
@@ -152,28 +155,47 @@ class PengerjaanServisResource extends Resource
                             ->schema([
                                 Select::make('barang_id')
                                     ->label('Sparepart')
-                                    ->options(fn() => Barang::all()->mapWithKeys(fn($item) => [
-                                        $item->id => $item->kode_barang . ' - ' . $item->nama_barang
-                                    ]))
+                                    ->options(fn() => Barang::all()->pluck('nama_barang', 'id'))
                                     ->reactive()
-                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                    ->afterStateUpdated(function ($state, callable $set) {
                                         $barang = Barang::find($state);
                                         $harga = $barang?->harga_jual ?? 0;
+                                        $stok = $barang?->stok ?? 0;
                                         $set('harga', $harga);
-                                        $set('subtotal', $get('qty') * $harga);
+                                        $set('qty', 1);
+                                        $set('subtotal', $harga * 1);
                                     })
                                     ->searchable()
                                     ->required(),
 
                                 TextInput::make('qty')
-                                    ->label('Qty')
-                                    ->numeric()
-                                    ->reactive()
-                                    ->afterStateUpdated(
-                                        fn($state, callable $set, callable $get) =>
-                                        $set('subtotal', $state * $get('harga'))
+                                    ->label(
+                                        fn(callable $get) =>
+                                        $get('barang_id')
+                                            ? 'Qty (Stok: ' . (Barang::find($get('barang_id'))?->stok ?? 0) . ')'
+                                            : 'Qty'
                                     )
-                                    ->required(),
+                                    ->numeric()
+                                    ->minValue(1)
+                                    ->reactive()
+                                    ->required()
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                        $barang = Barang::find($get('barang_id'));
+                                        $stok = $barang?->stok ?? 0;
+                                        $harga = $get('harga') ?? 0;
+
+                                        if ($state > $stok) {
+                                            $set('qty', $stok);
+                                            Notification::make()
+                                                ->title('Stok tidak mencukupi')
+                                                ->body("Qty diubah menjadi $stok karena stok tidak mencukupi.")
+                                                ->warning()
+                                                ->send();
+                                        }
+
+                                        $qty = (int) $get('qty') ?: 0;
+                                        $set('subtotal', $harga * $qty);
+                                    }),
 
                                 TextInput::make('harga')
                                     ->label('Harga')
@@ -187,24 +209,74 @@ class PengerjaanServisResource extends Resource
                                     ->disabled()
                                     ->dehydrated(true),
                             ])
-                            ->createItemButtonLabel('Tambah Sparepart')
+                            ->createItemButtonLabel('Tambah')
                             ->columns(4),
                     ])
                     ->action(function (array $data, PengerjaanServis $record) {
                         foreach ($data['items'] as $item) {
-                            $harga = $item['harga'] ?? 0;
-                            $qty = $item['qty'] ?? 0;
-                            $subtotal = $item['subtotal'] ?? ($harga * $qty);
+                            $barang = Barang::find($item['barang_id']);
+
+                            if (! $barang || $barang->stok < $item['qty']) {
+                                Notification::make()
+                                    ->title('Gagal Menambahkan')
+                                    ->body("Stok {$barang->nama_barang} tidak mencukupi.")
+                                    ->danger()
+                                    ->send();
+                                continue;
+                            }
 
                             PengerjaanSparepart::create([
                                 'pengerjaan_servis_id' => $record->id,
                                 'barang_id' => $item['barang_id'],
-                                'qty' => $qty,
-                                'harga' => $harga,
-                                'subtotal' => $subtotal,
+                                'qty' => $item['qty'],
+                                'harga' => $item['harga'],
+                                'subtotal' => $item['subtotal'],
                             ]);
 
-                            Barang::find($item['barang_id'])?->decrement('stok', $qty);
+                            $barang->decrement('stok', $item['qty']);
+                        }
+                    }),
+                Action::make('tambah_jasa')
+                    ->label('Tambah Jasa')
+                    ->icon('heroicon-o-plus-circle')
+                    ->color('warning')
+                    ->form(fn($record) => [
+                        Repeater::make('items')
+                            ->schema([
+                                Select::make('jasa_id')
+                                    ->label('Jasa')
+                                    ->options(function () use ($record) {
+                                        $asuransiId = $record->transaksiMasuk->asuransi_id ?? null;
+
+                                        if (!$asuransiId) return [];
+
+                                        return \App\Models\Jasa::where('asuransi_id', $asuransiId)
+                                            ->pluck('nama_jasa', 'id');
+                                    })
+                                    ->searchable()
+                                    ->required()
+                                    ->reactive()
+                                    ->afterStateUpdated(function ($state, callable $set) {
+                                        $jasa = \App\Models\Jasa::find($state);
+                                        $harga = $jasa?->harga ?? 0;
+                                        $set('harga', $harga);
+                                        $set('subtotal', $harga);
+                                    }),
+
+                                TextInput::make('harga')->numeric()->disabled()->dehydrated(true),
+                                TextInput::make('subtotal')->numeric()->disabled()->dehydrated(true),
+                            ])
+                            ->columns(3)
+                            ->createItemButtonLabel('Tambah'),
+                    ])
+                    ->action(function (array $data, $record) {
+                        foreach ($data['items'] as $item) {
+                            \App\Models\PengerjaanJasa::create([
+                                'pengerjaan_servis_id' => $record->id,
+                                'jasa_id' => $item['jasa_id'],
+                                'harga' => $item['harga'],
+                                'subtotal' => $item['subtotal'],
+                            ]);
                         }
                     }),
             ])
