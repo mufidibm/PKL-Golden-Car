@@ -110,16 +110,21 @@
         </thead>
         <tbody>
             @php $i = 1; $totalJasa = 0; @endphp
-            @foreach ($jasa as $item)
+            @foreach ($transaksi->pengerjaanServis->flatMap->pengerjaanJasa as $item)
                 @php $totalJasa += $item->harga; @endphp
                 <tr>
                     <td style="text-align: center;">{{ $i++ }}.</td>
-                    <td>{{ $item->nama_jasa }}</td>
+                    <td>{{ $item->jasa->nama_jasa }}</td>
                     <td colspan="2" class="text-right">
                         <span style="float: left;">Rp</span> {{ number_format($item->harga, 0, ',', '.') }}
                     </td>
                 </tr>
             @endforeach
+            @if ($transaksi->pengerjaanServis->flatMap->pengerjaanJasa->isEmpty())
+                <tr>
+                    <td colspan="3" style="text-align: center;">Belum ada jasa yang dipilih</td>
+                </tr>
+            @endif
             <tr>
                 <td style="border: none;"></td>
                 <td colspan="2" style="font-weight: bold;">TOTAL</td>
@@ -149,21 +154,21 @@
         </thead>
         <tbody>
             @php $i = 1; $totalSparepart = 0; @endphp
-            @foreach ($sparepart as $item)
-                @php $qty = 1; $subtotal = $item->harga_jual * $qty; $totalSparepart += $subtotal; @endphp
+            @foreach ($transaksi->pengerjaanServis->flatMap->pengerjaanSparepart as $item)
+                @php $qty = $item->qty; $subtotal = $item->harga * $qty; $totalSparepart += $subtotal; @endphp
                 <tr>
                     <td style="text-align: center;">{{ $i++ }}.</td>
-                    <td>{{ $item->nama_barang }}</td>
+                    <td>{{ $item->barang->nama_barang }}</td>
                     <td>{{ $qty }}</td>
                     <td class="text-right">
-                        <span style="float: left;">Rp</span> {{ number_format($item->harga_jual, 0, ',', '.') }}
+                        <span style="float: left;">Rp</span> {{ number_format($item->harga, 0, ',', '.') }}
                     </td>
                     <td class="text-right">
                         <span style="float: left;">Rp</span> {{ number_format($subtotal, 0, ',', '.') }}
                     </td>
                 </tr>
             @endforeach
-            @if ($sparepart->isEmpty())
+            @if ($transaksi->pengerjaanServis->flatMap->pengerjaanSparepart->isEmpty())
                 <tr>
                     <td colspan="5" style="text-align: center;">Belum ada sparepart yang dipilih</td>
                 </tr>
@@ -189,28 +194,12 @@
                 <td style="border: none;"></td>
                 <td style="border: none;"></td>
             </tr>
-            {{-- <tr>
-                <td style="border: none;"></td>
-                <td style="border: none;"></td>
-                <td colspan="2" style="font-weight: bold;">PPN JASA</td>
-                <td class="text-right">
-                    <span style="float: left;">Rp</span> {{ number_format($ppnJasa, 0, ',', '.') }}
-                </td>
-            </tr>
-            <tr>
-                <td style="border: none;"></td>
-                <td style="border: none;"></td>
-                <td colspan="2" style="font-weight: bold;">PPN SPAREPART</td>
-                <td class="text-right">
-                    <span style="float: left;">Rp</span> {{ number_format($ppnSparepart, 0, ',', '.') }}
-                </td>
-            </tr> --}}
             <tr>
                 <td style="border: none;"></td>
                 <td style="border: none;"></td>
                 <td colspan="2" style="font-weight: bold;">GRAND TOTAL</td>
                 <td class="text-right">
-                    <span style="float: left;">Rp</span> {{ number_format($totalBayar, 0, ',', '.') }}
+                    <span style="float: left;">Rp</span> {{ number_format($totalJasa + $totalSparepart, 0, ',', '.') }}
                 </td>
             </tr>
         </tbody>
@@ -238,7 +227,8 @@
     </div>
     <script>
         window.onload = function () {
-            window.print();
+            // Optional: Remove this if you don't want auto-print
+            // window.print();
         };
     </script>
 </body>
