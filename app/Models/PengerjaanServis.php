@@ -86,4 +86,15 @@ class PengerjaanServis extends Model
             ]);
         });
     }
+
+    public function pengerjaanJasa()
+{
+    return $this->hasMany(PengerjaanJasa::class);
+}
+
+public function pengerjaanSparepart()
+{
+    return $this->hasMany(PengerjaanSparepart::class);
+}
+
 }
