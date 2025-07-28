@@ -40,6 +40,6 @@ class AsuransiTableWidget extends BaseWidget
 
     public static function canView(): bool
     {
-        return true;
+        return request()->routeIs('filament.admin.resources.jasas.*');
     }
 }
