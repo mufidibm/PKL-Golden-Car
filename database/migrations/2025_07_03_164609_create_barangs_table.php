@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('kode_barang')->unique();
             $table->string('nama_barang');
-            $table->enum('kategori', ['Sparepart', 'Jasa', 'Lainnya']);
+            $table->enum('kategori', ['Sparepart', 'Bahan Paint', 'Bahan non Paint', 'Tools']);
             $table->string('satuan');
             $table->integer('stok')->default(0);
             $table->integer('harga_beli');

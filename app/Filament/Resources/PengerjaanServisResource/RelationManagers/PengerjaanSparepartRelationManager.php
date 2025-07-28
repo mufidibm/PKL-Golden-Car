@@ -26,7 +26,7 @@ class PengerjaanSparepartRelationManager extends RelationManager
                     ->money('IDR', true)
                     ->label('Subtotal')
                     ->summarize(
-                        \Filament\Tables\Columns\Summarizers\Sum::make()->label('Total Biaya')
+                        Sum::make()->label('Total Biaya')
                     ),
             ])
             ->actions([

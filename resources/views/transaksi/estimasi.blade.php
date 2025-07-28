@@ -2,9 +2,10 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <title>Estimasi Biaya Servis</title>
     <style>
         body {
-            font-family: arial;
+            font-family: Arial, sans-serif;
             margin: 20px;
         }
         table {
@@ -46,45 +47,18 @@
 <body>
     @php
         use Carbon\Carbon;
-        use App\Models\Asuransi;
-
-        $jasa = $Pembayaran->detail->where('jenis_item', 'jasa');
-        $sparepart = $Pembayaran->detail->where('jenis_item', 'sparepart');
-
-        // Hitung PPN secara manual
-        $ppnJasa = 0;
-        $ppnSparepart = 0;
-        $totalJasa = 0;
-        $totalSparepart = 0;
-
-        foreach ($jasa as $item) {
-            $totalJasa += $item->subtotal;
-            if (session('gunakan_ppn_jasa', false)) {
-                $ppnJasa += 0.11 * $item->subtotal;
-            }
-        }
-        foreach ($sparepart as $item) {
-            $totalSparepart += $item->subtotal;
-            if (session('gunakan_ppn_sparepart', false)) {
-                $ppnSparepart += 0.11 * $item->subtotal;
-            }
-        }
-
-        $tanggalFormatted = 'Bekasi, ' . Carbon::parse($Pembayaran->created_at)->translatedFormat('d F Y');
-        $setting = \App\Models\Setting::first();
+        $tanggalFormatted = 'Bekasi, ' . Carbon::parse($transaksi->waktu_masuk)->translatedFormat('d F Y');
     @endphp
     @if ($setting)
         <div style="display: flex; align-items: center; margin: 0; padding: 0 10px;">
             <div style="max-width: 180px;">
                 @if ($setting->getFirstMediaUrl('logo'))
-                    <img src="{{ $setting->getFirstMediaUrl('logo') }}"
-                         alt="Logo"
-                         style="height: 60px; border-radius: 8px; margin-right: 20px; position: relative; bottom: -8px">
+                    <img src="{{ $setting->getFirstMediaUrl('logo') }}" alt="Logo" style="height: 60px; border-radius: 8px; margin-right: 20px; position: relative; bottom: -8px">
                 @endif
                 <div style="font-size: 13px; margin: 0;">{{ $setting->alamat ?? '-' }}</div>
             </div>
             <div style="position: absolute; width: 100%; text-align: center; justify-self: center;">
-                <h1 style="font-size: 20px; font-weight: bold; margin: 0;">INVOICE KENDARAAN</h1>
+                <h1 style="font-size: 20px; font-weight: bold; margin: 0;">ESTIMASI BIAYA SERVIS</h1>
             </div>
         </div>
         <div style="display: flex; justify-content: space-between; font-size: 13px; position: relative; bottom: -4px; padding: 0 10px; margin: 0;">
@@ -94,65 +68,55 @@
         <hr style="border: 0.6px solid black; margin-bottom: 1.3px;">
         <hr style="border: 0.6px solid black; margin-top: 0;">
     @endif
-    <table style="width: 70%; border-collapse: collapse; border: none; font-size: 13px; font-weight: normal">
+    <table style="width: 70%; border-collapse: collapse; border: none; font-size: 13px; font-weight: normal;">
         <tr>
             <td style="padding: 4px; border: none;">Nama Asuransi</td>
-            <td style="padding: 4px; border: none;">
-                :&nbsp;{{ $Pembayaran->transaksiMasuk->asuransi->nama ?? '-' }}</td>
+            <td style="padding: 4px; border: none;">:&nbsp;{{ $transaksi->asuransi->nama ?? '-' }}</td>
         </tr>
         <tr>
             <td style="padding: 4px; border: none;">Nama Pemilik</td>
-            <td style="padding: 4px; border: none;">
-                :&nbsp;{{ $Pembayaran->transaksiMasuk->kendaraan->customer->nama ?? '-' }}</td>
+            <td style="padding: 4px; border: none;">:&nbsp;{{ $transaksi->kendaraan->customer->nama ?? '-' }}</td>
         </tr>
         <tr>
             <td style="padding: 4px; border: none;">Merk / Tipe Kendaraan</td>
-            <td style="padding: 4px; border: none;">
-                :&nbsp;{{ $Pembayaran->transaksiMasuk->kendaraan->merek ?? '-' }} /
-                {{ $Pembayaran->transaksiMasuk->kendaraan->tipe ?? '-' }}
-            </td>
+            <td style="padding: 4px; border: none;">:&nbsp;{{ $transaksi->kendaraan->merek ?? '-' }} / {{ $transaksi->kendaraan->tipe ?? '-' }}</td>
         </tr>
         <tr>
             <td style="padding: 4px; border: none;">Warna</td>
-            <td style="padding: 4px; border: none;">
-                :&nbsp;{{ $Pembayaran->transaksiMasuk->kendaraan->warna ?? '-' }}</td>
+            <td style="padding: 4px; border: none;">:&nbsp;{{ $transaksi->kendaraan->warna ?? '-' }}</td>
         </tr>
         <tr>
             <td style="padding: 4px; border: none;">No. Polisi</td>
-            <td style="padding: 4px; border: none;">
-                :&nbsp;{{ $Pembayaran->transaksiMasuk->kendaraan->no_polisi ?? '-' }}</td>
+            <td style="padding: 4px; border: none;">:&nbsp;{{ $transaksi->kendaraan->no_polisi ?? '-' }}</td>
         </tr>
         <tr>
-            <td style="padding: 4px; border: none;">Metode Pembayaran</td>
-            <td style="padding: 4px; border: none;">
-                :&nbsp;{{ $Pembayaran->metodePembayaran->nama_metode ?? '-' }}</td>
+            <td style="padding: 4px; border: none;">Keluhan</td>
+            <td style="padding: 4px; border: none;">:&nbsp;{{ $transaksi->keluhan ?? '-' }}</td>
         </tr>
     </table>
-    <p style="font-size: 13px; margin-bottom: 3px"><b>Terlampir Rincian Biaya Jasa :</b></p>
-    <table style="font-size: 13px">
+    <p style="font-size: 13px; margin-bottom: 3px;"><b>Terlampir Rincian Biaya Jasa :</b></p>
+    <table style="font-size: 13px;">
         <colgroup>
             <col style="width: 2%;">
             <col>
-            <col style="width: 15%;">
             <col>
         </colgroup>
         <thead>
             <tr>
                 <th>NO.</th>
                 <th>JENIS JASA</th>
-                <th>JENIS ASURANSI</th>
-                <th>HARGA</th>
+                <th colspan="2">HARGA</th>
             </tr>
         </thead>
         <tbody>
-            @php $i = 1; @endphp
+            @php $i = 1; $totalJasa = 0; @endphp
             @foreach ($jasa as $item)
+                @php $totalJasa += $item->harga; @endphp
                 <tr>
-                    <td style="text-align: center">{{ $i++ }}.</td>
-                    <td>{{ $item->nama_item }}</td>
-                    <td>{{ App\Models\Asuransi::find($item->qty)->nama ?? 'Tidak ada asuransi' }}</td>
-                    <td class="text-right">
-                        <span style="float: left;">Rp</span> {{ number_format($item->subtotal) }}
+                    <td style="text-align: center;">{{ $i++ }}.</td>
+                    <td>{{ $item->nama_jasa }}</td>
+                    <td colspan="2" class="text-right">
+                        <span style="float: left;">Rp</span> {{ number_format($item->harga, 0, ',', '.') }}
                     </td>
                 </tr>
             @endforeach
@@ -160,13 +124,13 @@
                 <td style="border: none;"></td>
                 <td colspan="2" style="font-weight: bold;">TOTAL</td>
                 <td class="text-right">
-                    <span style="float: left;">Rp</span> {{ number_format($totalJasa) }}
+                    <span style="float: left;">Rp</span> {{ number_format($totalJasa, 0, ',', '.') }}
                 </td>
             </tr>
         </tbody>
     </table>
-    <p style="font-size: 13px; margin-bottom: 3px"><b>Terlampir Rincian Biaya Sparepart :</b></p>
-    <table style="font-size: 13px">
+    <p style="font-size: 13px; margin-bottom: 3px;"><b>Terlampir Rincian Biaya Sparepart :</b></p>
+    <table style="font-size: 13px;">
         <colgroup>
             <col style="width: 2%;">
             <col>
@@ -184,41 +148,53 @@
             </tr>
         </thead>
         <tbody>
-            @php $i = 1; @endphp
+            @php $i = 1; $totalSparepart = 0; @endphp
             @foreach ($sparepart as $item)
+                @php $qty = 1; $subtotal = $item->harga_jual * $qty; $totalSparepart += $subtotal; @endphp
                 <tr>
-                    <td style="text-align: center">{{ $i++ }}.</td>
-                    <td>{{ $item->nama_item }}</td>
-                    <td>{{ $item->qty }}</td>
+                    <td style="text-align: center;">{{ $i++ }}.</td>
+                    <td>{{ $item->nama_barang }}</td>
+                    <td>{{ $qty }}</td>
                     <td class="text-right">
-                        <span style="float: left;">Rp</span> {{ number_format($item->harga_satuan) }}
+                        <span style="float: left;">Rp</span> {{ number_format($item->harga_jual, 0, ',', '.') }}
                     </td>
                     <td class="text-right">
-                        <span style="float: left;">Rp</span> {{ number_format($item->subtotal) }}
+                        <span style="float: left;">Rp</span> {{ number_format($subtotal, 0, ',', '.') }}
                     </td>
                 </tr>
             @endforeach
+            @if ($sparepart->isEmpty())
+                <tr>
+                    <td colspan="5" style="text-align: center;">Belum ada sparepart yang dipilih</td>
+                </tr>
+            @endif
             <tr>
                 <td style="border: none;"></td>
                 <td style="border: none;"></td>
                 <td colspan="2" style="font-weight: bold;">TOTAL</td>
                 <td class="text-right">
-                    <span style="float: left;">Rp</span> {{ number_format($totalSparepart) }}
+                    <span style="float: left;">Rp</span> {{ number_format($totalSparepart, 0, ',', '.') }}
                 </td>
             </tr>
             <tr>
                 <td style="border: none;"></td>
-                <td style="border: none;"></td>
-                <td style="border: none;"></td>
-                <td style="border: none;"></td>
+            </tr>
+            <tr>
                 <td style="border: none;"></td>
             </tr>
             <tr>
                 <td style="border: none;"></td>
                 <td style="border: none;"></td>
+                <td style="border: none;"></td>
+                <td style="border: none;"></td>
+                <td style="border: none;"></td>
+            </tr>
+            {{-- <tr>
+                <td style="border: none;"></td>
+                <td style="border: none;"></td>
                 <td colspan="2" style="font-weight: bold;">PPN JASA</td>
                 <td class="text-right">
-                    <span style="float: left;">Rp</span> {{ number_format($ppnJasa) }}
+                    <span style="float: left;">Rp</span> {{ number_format($ppnJasa, 0, ',', '.') }}
                 </td>
             </tr>
             <tr>
@@ -226,36 +202,22 @@
                 <td style="border: none;"></td>
                 <td colspan="2" style="font-weight: bold;">PPN SPAREPART</td>
                 <td class="text-right">
-                    <span style="float: left;">Rp</span> {{ number_format($ppnSparepart) }}
-                </td>
-            </tr>
-            <tr>
-                <td style="border: none;"></td>
-                <td style="border: none;"></td>
-                <td colspan="2" style="font-weight: bold;">TOTAL BAYAR</td>
-                <td class="text-right">
-                    <span style="float: left;">Rp</span> {{ number_format($Pembayaran->total_bayar) }}
-                </td>
-            </tr>
-            <tr>
-                <td style="border: none;"></td>
-                <td style="border: none;"></td>
-                <td colspan="2" style="font-weight: bold;">DIBAYAR</td>
-                <td class="text-right">
-                    <span style="float: left;">Rp</span> {{ number_format($Pembayaran->dibayar) }}
-                </td>
-            </tr>
-            {{-- <tr>
-                <td style="border: none;"></td>
-                <td style="border: none;"></td>
-                <td colspan="2" style="font-weight: bold;">KEMBALIAN</td>
-                <td class="text-right">
-                    <span style="float: left;">Rp</span> {{ number_format($Pembayaran->dibayar - $Pembayaran->total_bayar) }}
+                    <span style="float: left;">Rp</span> {{ number_format($ppnSparepart, 0, ',', '.') }}
                 </td>
             </tr> --}}
+            <tr>
+                <td style="border: none;"></td>
+                <td style="border: none;"></td>
+                <td colspan="2" style="font-weight: bold;">GRAND TOTAL</td>
+                <td class="text-right">
+                    <span style="float: left;">Rp</span> {{ number_format($totalBayar, 0, ',', '.') }}
+                </td>
+            </tr>
         </tbody>
     </table>
-    <p style="font-size: 13px">Demikian invoice ini kami sampaikan atas perhatian dan kerjasamanya kami ucapkan, <br>terimakasih.</p>
+    <p style="font-size: 13px;">
+        Demikian estimasi ini kami sampaikan atas perhatian dan kerjasamanya kami ucapkan, <br>terimakasih.
+    </p>
     <div class="pengesahan">
         <div class="sah-kiri">
             <p style="margin: 0;">{{ $tanggalFormatted }} <br>
@@ -274,10 +236,10 @@
             </p>
         </div>
     </div>
+    <script>
+        window.onload = function () {
+            window.print();
+        };
+    </script>
 </body>
 </html>
-<script>
-    window.onload = function () {
-        window.print();
-    };
-</script>

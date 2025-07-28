@@ -30,50 +30,50 @@ class PengerjaanServisResource extends Resource
     protected static ?string $pluralLabel = 'Pengerjaan Service';
 
     public static function form(Form $form): Form
-    {
-        return $form->schema([
-            Select::make('transaksi_masuk_id')
-                ->label('Transaksi Masuk')
-                ->searchable()
-                ->getSearchResultsUsing(function (string $search) {
-                    return TransaksiMasuk::with('kendaraan')
-                        ->whereHas('kendaraan', function ($query) use ($search) {
-                            $query->where('no_polisi', 'like', "%{$search}%");
-                        })
-                        ->get()
-                        ->mapWithKeys(function ($item) {
-                            return [
-                                $item->id => $item->kendaraan->no_polisi . ' - ' . $item->created_at->format('d/m/Y'),
-                            ];
-                        });
-                })
-                ->getOptionLabelUsing(function ($value): ?string {
-                    $item = TransaksiMasuk::with('kendaraan')->find($value);
-                    return $item ? $item->kendaraan->no_polisi . ' - ' . $item->created_at->format('d/m/Y') : null;
-                })
-                ->required(),
+{
+    return $form->schema([
+        Select::make('transaksi_masuk_id')
+            ->label('Transaksi Masuk')
+            ->searchable()
+            ->getSearchResultsUsing(function (string $search) {
+                return TransaksiMasuk::with('kendaraan')
+                    ->whereHas('kendaraan', function ($query) use ($search) {
+                        $query->where('no_polisi', 'like', "%{$search}%");
+                    })
+                    ->get()
+                    ->mapWithKeys(function ($item) {
+                        return [
+                            $item->id => $item->kendaraan->no_polisi . ' - ' . $item->created_at->format('d/m/Y'),
+                        ];
+                    });
+            })
+            ->getOptionLabelUsing(function ($value): ?string {
+                $item = TransaksiMasuk::with('kendaraan')->find($value);
+                return $item ? $item->kendaraan->no_polisi . ' - ' . $item->created_at->format('d/m/Y') : null;
+            })
+            ->required(),
 
-            Select::make('mekanik_id')
-                ->label('Mekanik')
-                ->relationship('mekanik', 'nama')
-                ->searchable()
-                ->required(),
+        Select::make('mekanik_id')
+            ->label('Mekanik')
+            ->relationship('mekanik', 'nama')
+            ->searchable()
+            ->required(),
 
-            Select::make('status')
-                ->options([
-                    'Menunggu' => 'Menunggu',
-                    'Sedang Dikerjakan' => 'Sedang Dikerjakan',
-                    'Menunggu Sparepart' => 'Menunggu Sparepart',
-                    'Pemeriksaan Akhir' => 'Pemeriksaan Akhir',
-                    'Selesai' => 'Selesai',
-                ])
-                ->required(),
+        Select::make('status')
+            ->options([
+                'Waiting' => 'Waiting',
+                'Sedang Dikerjakan' => 'Sedang Dikerjakan',
+                'Menunggu Sparepart' => 'Menunggu Sparepart',
+                'Pemeriksaan Akhir' => 'Pemeriksaan Akhir',
+                'Selesai' => 'Selesai',
+            ])
+            ->required(),
 
-            DateTimePicker::make('mulai')->required(),
-            DateTimePicker::make('selesai')->nullable(),
-            TextInput::make('catatan')->label('Catatan')->nullable(),
-        ]);
-    }
+        DateTimePicker::make('mulai')->required(),
+        DateTimePicker::make('selesai')->nullable(),
+        TextInput::make('catatan')->label('Catatan')->nullable(),
+    ]);
+}
 
 
     public static function table(Table $table): Table
@@ -103,12 +103,11 @@ class PengerjaanServisResource extends Resource
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn(string $state) => match ($state) {
-                        'Menunggu' => 'gray',
+                        'Waiting' => 'gray',
                         'Sedang Dikerjakan' => 'warning',
                         'Menunggu Sparepart' => 'danger',
                         'Pemeriksaan Akhir' => 'info',
                         'Selesai' => 'success',
-                        default => 'gray',
                     }),
 
                 TextColumn::make('mulai')->dateTime(),
@@ -123,7 +122,7 @@ class PengerjaanServisResource extends Resource
                 SelectFilter::make('status')
                     ->label('Status Pengerjaan')
                     ->options([
-                        'Menunggu' => 'Menunggu',
+                        'Waiting' => 'Waiting',
                         'Sedang Dikerjakan' => 'Sedang Dikerjakan',
                         'Menunggu Sparepart' => 'Menunggu Sparepart',
                         'Pemeriksaan Akhir' => 'Pemeriksaan Akhir',
@@ -205,7 +204,7 @@ class PengerjaanServisResource extends Resource
                                 'subtotal' => $subtotal,
                             ]);
 
-                            // Barang::find($item['barang_id'])?->decrement('stok', $qty);
+                            Barang::find($item['barang_id'])?->decrement('stok', $qty);
                         }
                     }),
             ])
@@ -222,7 +221,7 @@ class PengerjaanServisResource extends Resource
     public static function getRelations(): array
     {
         return [
-            PengerjaanSparepartRelationManager::class,
+           PengerjaanSparepartRelationManager::class,
         ];
     }
 

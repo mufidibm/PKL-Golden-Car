@@ -3,131 +3,142 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PembayaranResource\Pages;
+use App\Filament\Resources\PembayaranResource\RelationManagers;
 use App\Models\Pembayaran;
+use App\Models\Asuransi;
 use Filament\Forms;
+use Filament\Forms\Components\{Grid, Hidden, Repeater, Select, TextInput};
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Forms\Components\{Grid, Hidden, Repeater, Select, TextInput};
-use Filament\Forms\Get;
-use Filament\Forms\Set;
+use Filament\Forms\Components\Toggle;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 
 class PembayaranResource extends Resource
 {
     protected static ?string $model = Pembayaran::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
     protected static ?int $navigationSort = 99;
+
     protected static ?string $navigationGroup = 'Lainnya';
 
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Grid::make(2)->schema([
-                    Hidden::make('id_transaksi_masuk')
-                        ->default(fn() => session('bayar_transaksi_id'))
-                        ->required(),
+        if ($form->getOperation() === 'create' && (!session()->has('bayar_transaksi_id') || !session()->has('bayar_detail_items') || !session()->has('bayar_total'))) {
+            abort(403, 'Data transaksi tidak ditemukan. Silakan mulai proses pembayaran dari halaman Transaksi Masuk.');
+        }
 
-                    Select::make('metode_pembayaran_id')
-                        ->label('Metode Pembayaran')
-                        ->relationship('metodePembayaran', 'nama_metode')
-                        ->required(),
-                ]),
+        return $form->schema([
+            Grid::make(2)->schema([
+                Toggle::make('gunakan_ppn_jasa')
+                    ->label('Gunakan PPN 11% pada Jasa')
+                    ->reactive()
+                    ->dehydrated(false)
+                    ->afterStateUpdated(function ($state, Set $set, Get $get) {
+                        session(['gunakan_ppn_jasa' => $state]);
+                        static::hitungTotal($set, $get);
+                    }),
 
-                Grid::make(3)->schema([
-                    TextInput::make('biaya_jasa')
-                        ->label('Biaya Jasa Tambahan')
-                        ->numeric()
-                        ->default(0)
-                        ->reactive()
-                        ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                            $baseTotal = intval(session('bayar_total')) ?? 0;
-                            $totalBaru = $baseTotal + intval($state);
-                            $set('total_bayar', $totalBaru);
+                Toggle::make('gunakan_ppn_sparepart')
+                    ->label('Gunakan PPN 11% untuk Sparepart')
+                    ->reactive()
+                    ->dehydrated(false)
+                    ->afterStateUpdated(function ($state, Set $set, Get $get) {
+                        session(['gunakan_ppn_sparepart' => $state]);
+                        static::hitungTotal($set, $get);
+                    }),
 
-                            $kembalian = intval($get('dibayar')) - $totalBaru;
-                            $set('kembalian', $kembalian > 0 ? $kembalian : 0);
-                        }),
+                Hidden::make('id_transaksi_masuk')
+                    ->default(fn() => session('bayar_transaksi_id'))
+                    ->required(),
 
-                    TextInput::make('total_bayar')
-                        ->label('Total Bayar')
-                        ->numeric()
-                        ->required()
-                        ->reactive()
-                        ->default(fn() => session('bayar_total') ?? 0),
+                Select::make('metode_pembayaran_id')
+                    ->label('Metode Pembayaran')
+                    ->relationship('metodePembayaran', 'nama_metode')
+                    ->required(),
+            ]),
 
-                    TextInput::make('dibayar')
-                        ->label('Dibayar')
-                        ->numeric()
-                        ->required()
-                        ->reactive()
-                        ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                            $kembalian = intval($state) - intval($get('total_bayar'));
-                            $set('kembalian', $kembalian > 0 ? $kembalian : 0);
-                        })
-                        ->rules([
-                            function (Get $get) {
-                                return function ($attribute, $value, $fail) use ($get) {
-                                    if ($value < $get('total_bayar')) {
-                                        $fail("Jumlah yang dibayar tidak boleh kurang dari total harus bayar.");
-                                    }
-                                };
-                            },
-                        ]),
-                ]),
+            Grid::make(3)->schema([
+                TextInput::make('total_bayar')
+                    ->label('Total Bayar')
+                    ->numeric()
+                    ->readOnly()
+                    ->required()
+                    ->default(fn(Get $get) => session('bayar_total') ?? 0),
 
-                Grid::make(1)->schema([
-                    TextInput::make('kembalian')
-                        ->label('Kembalian')
-                        ->numeric()
-                        ->disabled()
-                        ->dehydrated(false)
-                        ->default(0),
-                ]),
+                TextInput::make('dibayar')
+                    ->label('Dibayar')
+                    ->numeric()
+                    ->required()
+                    ->reactive()
+                    ->debounce(500)
+                    ->afterStateUpdated(fn($state, Set $set, Get $get) => $set('kembalian', max(0, intval($state) - intval($get('total_bayar')))))
+                    ->rules([
+                        fn(Get $get) => function ($attribute, $value, $fail) use ($get) {
+                            if (intval($value) < intval($get('total_bayar'))) {
+                                $fail('Jumlah dibayar tidak boleh kurang dari total yang harus dibayar.');
+                            }
+                        }
+                    ]),
+            ]),
+            Grid::make(1)->schema([
+                TextInput::make('kembalian')
+                    ->label('Kembalian')
+                    ->numeric()
+                    ->disabled()
+                    ->dehydrated(false)
+                    ->default(0),
+            ]),
 
+            Grid::make(1)->schema([
                 Repeater::make('detail')
                     ->label('Rincian Pembayaran')
                     ->default(session('bayar_detail_items') ?? [])
                     ->disableItemCreation()
+                    ->disableItemDeletion()
                     ->schema([
-                        Select::make('jenis_item')
+                        Hidden::make('jenis_item'),
+                        Hidden::make('item_id'),
+                        Hidden::make('nama_item'),
+
+                        TextInput::make('jenis_item')
                             ->label('Jenis Item')
-                            ->options(['servis' => 'Jasa Servis', 'sparepart' => 'Sparepart'])
-                            ->required()
+                            ->readOnly()
+                            ->dehydrated(false)
                             ->columnSpan(2),
 
-                        TextInput::make('item_id')
-                            ->label('ID Item')
-                            ->required()
-                            ->numeric()
-                            ->columnSpan(2)
-                            ->readOnly(),
-
                         TextInput::make('nama_item')
-                            ->label('Nama Item')
-                            ->required()
-                            ->columnSpan(4)
-                            ->readOnly(),
+                            ->label(fn(Get $get) => $get('jenis_item') === 'jasa' ? 'Nama Jasa' : 'Nama Sparepart')
+                            ->readOnly()
+                            ->columnSpan(4),
 
                         TextInput::make('qty')
-                            ->label('Qty')
-                            ->required()
-                            ->numeric()
-                            ->columnSpan(2)
-                            ->readOnly(),
+                            ->label(fn(Get $get) => $get('jenis_item') === 'jasa' ? 'Jenis Asuransi' : 'Qty')
+                            ->readOnly()
+                            ->formatStateUsing(function ($state, Get $get) {
+                                if ($get('jenis_item') === 'jasa') {
+                                    $asuransi = Asuransi::find($state);
+                                    return $asuransi ? $asuransi->nama : '-';
+                                }
+                                return $state;
+                            })
+                            ->dehydrated(false)
+                            ->columnSpan(2),
 
                         TextInput::make('harga_satuan')
-                            ->label('Harga Satuan')
-                            ->required()
+                            ->label(fn(Get $get) => $get('jenis_item') === 'jasa' ? 'Harga' : 'Harga Satuan')
                             ->numeric()
-                            ->columnSpan(2)
-                            ->readOnly(),
+                            ->readOnly()
+                            ->columnSpan(2),
 
                         TextInput::make('subtotal')
                             ->label('Subtotal')
-                            ->required()
                             ->numeric()
                             ->disabled()
                             ->dehydrated(false)
@@ -135,7 +146,33 @@ class PembayaranResource extends Resource
                     ])
                     ->columns(12)
                     ->columnSpanFull(),
-            ]);
+            ]),
+        ]);
+    }
+
+    public static function hitungTotal(Set $set, Get $get): void
+    {
+        $detailItems = session('bayar_detail_items') ?? [];
+        $ppnJasa = 0;
+        $ppnSparepart = 0;
+
+        foreach ($detailItems as $item) {
+            if ($item['jenis_item'] === 'jasa' && $get('gunakan_ppn_jasa')) {
+                $ppnJasa += 0.11 * $item['subtotal'];
+            }
+
+            if ($item['jenis_item'] === 'sparepart' && $get('gunakan_ppn_sparepart')) {
+                $ppnSparepart += 0.11 * $item['subtotal'];
+            }
+        }
+
+        $baseTotal = intval(session('bayar_total') ?? 0);
+        $totalBayar = $baseTotal + $ppnJasa + $ppnSparepart;
+
+        $set('total_bayar', $totalBayar);
+
+        $kembalian = intval($get('dibayar')) - $totalBayar;
+        $set('kembalian', $kembalian > 0 ? $kembalian : 0);
     }
 
     public static function table(Table $table): Table
@@ -164,9 +201,7 @@ class PembayaranResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])
-            ->emptyStateActions([
-                Tables\Actions\CreateAction::make(),
-            ]);
+            ->emptyStateActions([]);
     }
 
     public static function getRelations(): array

@@ -25,8 +25,7 @@ class User extends Authenticatable implements FilamentUser
         if ($this->id === 1) return true;
 
         // Bisa akses jika punya role admin atau permission khusus
-        // return $this->hasAnyRole(['admin', 'kasir', 'owner', 'mekanik']);
-        return true;
+        return $this->hasAnyRole(['admin', 'kasir', 'owner', 'mekanik']);
     }
 
     protected $fillable = [

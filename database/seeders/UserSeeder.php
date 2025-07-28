@@ -16,39 +16,39 @@ class UserSeeder extends Seeder
     {
         //// Membuat user admin
         $admin = User::firstOrCreate([
-            'email' => 'admin@app.com',
+            'email' => 'admin@seeder.com',
         ], [
-            'name' => 'Super Admin',
-            'password' => Hash::make('12345678'),
+            'name' => 'Admin',
+            'password' => Hash::make('password'),
         ]);
         $admin->assignRole('Admin');
 
-        // // Membuat user kasir
-        // $kasir = User::firstOrCreate([
-        //     'email' => 'kasir@app.com',
-        // ], [
-        //     'name' => 'Kasir',
-        //     'password' => Hash::make('12345678'),
-        // ]);
-        // $kasir->assignRole('kasir');
+        // Membuat user kasir
+        $kasir = User::firstOrCreate([
+            'email' => 'kasir@seeder.com',
+        ], [
+            'name' => 'Kasir',
+            'password' => Hash::make('password'),
+        ]);
+        $kasir->assignRole('kasir');
 
-        // // Membuat user mekanik
-        // $mekanik = User::firstOrCreate([
-        //     'email' => 'mekanik@app.com',
-        // ], [
-        //     'name' => 'Mekanik',
-        //     'password' => Hash::make('12345678'),
-        // ]);
-        // $mekanik->assignRole('mekanik');
+        // Membuat user mekanik
+        $mekanik = User::firstOrCreate([
+            'email' => 'mekanik@seeder.com',
+        ], [
+            'name' => 'Mekanik',
+            'password' => Hash::make('password'),
+        ]);
+        $mekanik->assignRole('mekanik');
 
-        // // Membuat user owner
-        // $owner = User::firstOrCreate([
-        //     'email' => 'owner@app.com',
-        // ], [
-        //     'name' => 'Owner',
-        //     'password' => Hash::make('12345678'),
-        // ]);
-        // $owner->assignRole('owner');
+        // Membuat user owner
+        $owner = User::firstOrCreate([
+            'email' => 'owner@seeder.com',
+        ], [
+            'name' => 'Owner',
+            'password' => Hash::make('password'),
+        ]);
+        $owner->assignRole('owner');
 
     }
 }

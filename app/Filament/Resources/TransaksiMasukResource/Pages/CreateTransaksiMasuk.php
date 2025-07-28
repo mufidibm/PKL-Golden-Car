@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Filament\Resources\TransaksiMasukResource\Pages;
+    namespace App\Filament\Resources\TransaksiMasukResource\Pages;
 
-use App\Filament\Resources\TransaksiMasukResource;
-use Filament\Actions;
-use Filament\Resources\Pages\CreateRecord;
+    use App\Filament\Resources\TransaksiMasukResource;
+    use Filament\Actions;
+    use Filament\Notifications\Notification;
+    use Filament\Resources\Pages\CreateRecord;
 
-class CreateTransaksiMasuk extends CreateRecord
-{
-    protected static string $resource = TransaksiMasukResource::class;
-}
+    class CreateTransaksiMasuk extends CreateRecord
+    {
+        protected static string $resource = TransaksiMasukResource::class;
+    }

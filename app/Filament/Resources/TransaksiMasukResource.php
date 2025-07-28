@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\TransaksiMasukResource\Pages;
 use App\Filament\Resources\TransaksiMasukResource\RelationManagers;
+use App\Models\Asuransi;
 use App\Models\TransaksiMasuk;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
@@ -16,6 +17,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Log;
 
 class TransaksiMasukResource extends Resource
 {
@@ -37,6 +39,15 @@ class TransaksiMasukResource extends Resource
                     ->relationship('kendaraan', 'no_polisi')
                     ->required()
                     ->searchable(),
+
+                Select::make('asuransi_id')
+                    ->label('Jenis Asuransi')
+                    ->relationship('asuransi', 'nama')
+                    ->required()
+                    ->default(function () {
+                        $asuransi = Asuransi::where('nama', 'Pribadi')->first();
+                        return $asuransi ? $asuransi->id : null;
+                    }),
 
                 Select::make('status')
                     ->options([
@@ -62,29 +73,48 @@ class TransaksiMasukResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('kendaraan.customer.nama')->label('Customer'),
-                TextColumn::make('kendaraan.no_polisi')->label('No Polisi'),
-                TextColumn::make('status')->badge()->color(fn(string $state): string => match ($state) {
-                    'menunggu' => 'gray',
-                    'sedang dikerjakan' => 'warning',
-                    'menunggu sparepart' => 'danger',
-                    'pemeriksaan akhir' => 'info',
-                    'selesai' => 'success',
-                }),
+                TextColumn::make('kendaraan.customer.nama')
+                    ->label('Customer')
+                    ->searchable(['nama']),
+                TextColumn::make('kendaraan.no_polisi')
+                    ->label('No Polisi')
+                    ->searchable(),
+                TextColumn::make('status')
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'menunggu' => 'gray',
+                        'sedang dikerjakan' => 'warning',
+                        'menunggu sparepart' => 'danger',
+                        'pemeriksaan akhir' => 'info',
+                        'selesai' => 'success',
+                    })
+                    ->searchable(),
                 TextColumn::make('status_pembayaran')
-                ->label('Pembayaran')
-                ->getStateUsing(function ($record) {
-                    return $record->pembayaran ? 'Sudah Bayar' : 'Belum Bayar';
-                })
-                ->badge()
-                ->color(fn ($state) => $state === 'Sudah Bayar' ? 'success' : 'danger'),
-                TextColumn::make('waktu_masuk')->label('Masuk')->since(),
+                    ->label('Pembayaran')
+                    ->getStateUsing(function ($record) {
+                        return $record->pembayaran ? 'Sudah Bayar' : 'Belum Bayar';
+                    })
+                    ->badge()
+                    ->color(fn($state) => $state === 'Sudah Bayar' ? 'success' : 'danger'),
+                TextColumn::make('waktu_masuk')
+                    ->label('Masuk')
+                    ->since(),
+                TextColumn::make('keluhan')
+                    ->label('Keluhan')
+                    ->searchable()
+                    ->hidden(),
             ])
-            ->filters([
-                //
-            ])
+            ->filters([])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                // Tables\Actions\Action::make('cetakEstimasi')
+                //     ->label('Cetak Estimasi')
+                //     ->icon('heroicon-o-printer')
+                //     ->url(fn($record) => route('transaksi.estimasi', $record->id))
+                //     ->openUrlInNewTab()
+                //     ->action(function ($record) {
+                //         Log::info('Cetak Estimasi clicked from table', ['transaksi_id' => $record->id]);
+                //     }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

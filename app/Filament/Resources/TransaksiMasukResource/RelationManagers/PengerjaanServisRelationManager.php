@@ -3,7 +3,9 @@
 namespace App\Filament\Resources\TransaksiMasukResource\RelationManagers;
 
 use App\Models\Barang;
+use App\Models\Jasa;
 use App\Models\PengerjaanSparepart;
+use App\Models\PengerjaanJasa;
 use Filament\Forms;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Repeater;
@@ -143,6 +145,50 @@ class PengerjaanServisRelationManager extends RelationManager
                             ]);
 
                             // $barang->decrement('stok', $item['qty']);
+                        }
+                    }),
+
+                Action::make('tambah_jasa')
+                    ->label('Tambah Jasa')
+                    ->icon('heroicon-o-plus-circle')
+                    ->color('warning')
+                    ->form(fn($record) => [
+                        Repeater::make('items')
+                            ->schema([
+                                Select::make('jasa_id')
+                                    ->label('Jasa')
+                                    ->options(function () use ($record) {
+                                        $asuransiId = $record->transaksiMasuk->asuransi_id ?? null;
+
+                                        if (!$asuransiId) return [];
+
+                                        return \App\Models\Jasa::where('asuransi_id', $asuransiId)
+                                            ->pluck('nama_jasa', 'id');
+                                    })
+                                    ->searchable()
+                                    ->required()
+                                    ->reactive()
+                                    ->afterStateUpdated(function ($state, callable $set) {
+                                        $jasa = \App\Models\Jasa::find($state);
+                                        $harga = $jasa?->harga ?? 0;
+                                        $set('harga', $harga);
+                                        $set('subtotal', $harga);
+                                    }),
+
+                                TextInput::make('harga')->numeric()->disabled()->dehydrated(true),
+                                TextInput::make('subtotal')->numeric()->disabled()->dehydrated(true),
+                            ])
+                            ->columns(3)
+                            ->createItemButtonLabel('Tambah'),
+                    ])
+                    ->action(function (array $data, $record) {
+                        foreach ($data['items'] as $item) {
+                            \App\Models\PengerjaanJasa::create([
+                                'pengerjaan_servis_id' => $record->id,
+                                'jasa_id' => $item['jasa_id'],
+                                'harga' => $item['harga'],
+                                'subtotal' => $item['subtotal'],
+                            ]);
                         }
                     }),
             ]);

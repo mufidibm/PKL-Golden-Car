@@ -9,14 +9,16 @@ class PembayaranDetail extends Model
 {
     use HasFactory;
 
-     protected $fillable = [
+    protected $fillable = [
         'pembayaran_id',
+        'jenis_item',
         'item_id',
         'nama_item',
         'qty',
         'harga_satuan',
         'subtotal',
     ];
+
 
     public function pembayaran()
     {

@@ -26,7 +26,7 @@ CREATE TABLE `barangs` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `kode_barang` varchar(255) NOT NULL,
   `nama_barang` varchar(255) NOT NULL,
-  `kategori` enum('Sparepart','Jasa','Lainnya') NOT NULL,
+  `kategori` enum('Sparepart','Bahan Paint','Bahan Non Paint','Tools') NOT NULL,
   `satuan` varchar(255) NOT NULL,
   `stok` int(11) NOT NULL DEFAULT 0,
   `harga_beli` int(11) NOT NULL,

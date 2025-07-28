@@ -18,7 +18,7 @@ class StatusKendaraan extends Widget
 
     public function mount()
     {
-        $this->waiting = \App\Models\PengerjaanServis::where('status', 'Menunggu')->count();
+        $this->waiting = \App\Models\PengerjaanServis::where('status', 'Waiting')->count();
         $this->sedangDikerjakan = \App\Models\PengerjaanServis::where('status', 'Sedang Dikerjakan')->count();
         $this->menungguSparepart = \App\Models\PengerjaanServis::where('status', 'Menunggu Sparepart')->count();
         $this->pemeriksaanAkhir = \App\Models\PengerjaanServis::where('status', 'Pemeriksaan Akhir')->count();

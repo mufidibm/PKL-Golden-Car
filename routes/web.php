@@ -5,8 +5,10 @@ use App\Http\Controllers\KendaraanDetailController;
 use App\Http\Controllers\PembayaranController;
 use App\Http\Controllers\PengerjaanSparepartController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\EstimateController;
 use App\Http\Controllers\LaporanPembayaranExportController;
 use App\Http\Controllers\LaporanPendapatanExportController;
+use App\Http\Controllers\PengerjaanJasaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,9 +30,12 @@ Route::delete('/sparepart/{id}', [PengerjaanSparepartController::class, 'destroy
 Route::post('/pembayaran/dari-transaksi/{transaksi}', [PembayaranController::class, 'dariTransaksi'])
     ->name('pembayaran.dari-transaksi');
 Route::delete('/pembayaran/{id}', [PembayaranController::class, 'destroy'])->name('pembayaran.destroy');
+Route::delete('/jasa/{id}', [PengerjaanJasaController::class, 'destroy'])->name('jasa.delete');
+
 
 Route::get('/invoice/{id}', [InvoiceController::class, 'show']);
 Route::get('/invoice/{id}/cetak', [InvoiceController::class, 'cetak'])->name('invoice.cetak');
+Route::get('/transaksi/{id}/estimasi', [EstimateController::class, 'cetak'])->name('transaksi.estimasi');
 
 Route::get('laporan-pembayaran/export-pdf', [LaporanPembayaranExportController::class, 'exportPdf'])->name('laporan-pembayaran.export-pdf');
 Route::get('laporan-pendapatan/export-pdf', [LaporanPendapatanExportController::class, 'exportPdf'])->name('laporan-pendapatan.export-pdf');

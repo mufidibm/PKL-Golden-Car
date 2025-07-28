@@ -18,9 +18,20 @@ class PengerjaanServis extends Model
         'selesai',
     ];
 
+    public function jasas()
+    {
+        return $this->hasMany(\App\Models\PengerjaanJasa::class);
+    }
+
+
     public function transaksi()
     {
         return $this->belongsTo(TransaksiMasuk::class, 'transaksi_masuk_id');
+    }
+
+    public function jasa()
+    {
+        return $this->belongsTo(Jasa::class);
     }
 
     public function mekanik()
@@ -50,7 +61,12 @@ class PengerjaanServis extends Model
 
     public function transaksiMasuk()
     {
-        return $this->belongsTo(\App\Models\TransaksiMasuk::class, 'transaksi_masuk_id');
+        return $this->belongsTo(\App\Models\TransaksiMasuk::class);
+    }
+
+    public function asuransi()
+    {
+        return $this->belongsTo(Asuransi::class);
     }
 
     protected static function booted()

@@ -38,8 +38,9 @@ class BarangResource extends Resource
                 Select::make('kategori')
                     ->options([
                         'Sparepart' => 'Sparepart',
-                        'Jasa' => 'Jasa',
-                        'Lainnya' => 'Lainnya',
+                        'Bahan Paint' => 'Bahan Paint',
+                        'Bahan Non Paint' => 'Bahan Non Paint',
+                        'Tools' => 'Tools'
                     ])
                     ->required(),
                 TextInput::make('satuan')->required(),
@@ -64,8 +65,9 @@ class BarangResource extends Resource
                 SelectFilter::make('kategori')
                     ->options([
                         'Sparepart' => 'Sparepart',
-                        'Jasa' => 'Jasa',
-                        'Lainnya' => 'Lainnya',
+                        'Bahan Paint' => 'Bahan Paint',
+                        'Bahan Non Paint' => 'Bahan Non Paint',
+                        'Tools' => 'Tools'
                     ])
             ])
             ->actions([

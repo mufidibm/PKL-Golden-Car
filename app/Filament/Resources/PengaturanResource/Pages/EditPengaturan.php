@@ -21,17 +21,19 @@ class EditPengaturan extends EditRecord
         ];
     }
 
-    protected function getFormSchema(): array
+protected function getFormSchema(): array
 {
     return [
         TextInput::make('nama_bengkel')->label('Nama Bengkel')->required(),
         Textarea::make('alamat')->label('Alamat')->required(),
         TextInput::make('telepon')->label('No. Telepon')->required(),
         TextInput::make('email')->label('Email')->email(),
-        FileUpload::make('logo')
+        SpatieMediaLibraryFileUpload::make('logo')
             ->label('Logo')
-            ->image()
+            ->collection('logo')
+            ->disk('public')
             ->directory('logo')
+            ->image()
             ->imageEditor()
             ->preserveFilenames(),
     ];

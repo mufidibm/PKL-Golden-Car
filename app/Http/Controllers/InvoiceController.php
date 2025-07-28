@@ -22,7 +22,7 @@ class InvoiceController extends Controller
 
     public function cetak($id)
     {
-        $Pembayaran = \App\Models\Pembayaran::with([
+        $Pembayaran = Pembayaran::with([
             'transaksiMasuk.customer',
             'transaksiMasuk.kendaraan',
             'detail'

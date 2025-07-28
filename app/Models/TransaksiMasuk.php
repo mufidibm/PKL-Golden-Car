@@ -23,6 +23,11 @@ class TransaksiMasuk extends Model
         return $this->belongsTo(\App\Models\Kendaraan::class, 'kendaraan_id');
     }
 
+    public function asuransi()
+    {
+        return $this->belongsTo(Asuransi::class);
+    }
+
     public function paketServis()
     {
         return $this->belongsTo(PaketServis::class);
