@@ -16,39 +16,39 @@ class UserSeeder extends Seeder
     {
         //// Membuat user admin
         $admin = User::firstOrCreate([
-            'email' => 'admin@seeder.com',
+            'email' => 'admin@app.com',
         ], [
             'name' => 'Admin',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('12345678'),
         ]);
         $admin->assignRole('Admin');
 
-        // Membuat user kasir
-        $kasir = User::firstOrCreate([
-            'email' => 'kasir@seeder.com',
-        ], [
-            'name' => 'Kasir',
-            'password' => Hash::make('password'),
-        ]);
-        $kasir->assignRole('kasir');
+        // // Membuat user kasir
+        // $kasir = User::firstOrCreate([
+        //     'email' => 'kasir@seeder.com',
+        // ], [
+        //     'name' => 'Kasir',
+        //     'password' => Hash::make('password'),
+        // ]);
+        // $kasir->assignRole('kasir');
 
-        // Membuat user mekanik
-        $mekanik = User::firstOrCreate([
-            'email' => 'mekanik@seeder.com',
-        ], [
-            'name' => 'Mekanik',
-            'password' => Hash::make('password'),
-        ]);
-        $mekanik->assignRole('mekanik');
+        // // Membuat user mekanik
+        // $mekanik = User::firstOrCreate([
+        //     'email' => 'mekanik@seeder.com',
+        // ], [
+        //     'name' => 'Mekanik',
+        //     'password' => Hash::make('password'),
+        // ]);
+        // $mekanik->assignRole('mekanik');
 
-        // Membuat user owner
-        $owner = User::firstOrCreate([
-            'email' => 'owner@seeder.com',
-        ], [
-            'name' => 'Owner',
-            'password' => Hash::make('password'),
-        ]);
-        $owner->assignRole('owner');
+        // // Membuat user owner
+        // $owner = User::firstOrCreate([
+        //     'email' => 'owner@seeder.com',
+        // ], [
+        //     'name' => 'Owner',
+        //     'password' => Hash::make('password'),
+        // ]);
+        // $owner->assignRole('owner');
 
     }
 }

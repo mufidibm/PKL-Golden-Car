@@ -16,10 +16,11 @@ class SettingSeeder extends Seeder
          
         if (Setting::count() == 0) {
             Setting::create([
-                'nama_bengkel' => 'Bengkel Maju Jaya',
-                'alamat'       => 'Jl. Mekar No. 123, Surabaya',
-                'telepon'      => '081234567890',
-                'email'        => 'info@bengkelmaju.com',
+                'nama_bengkel' => 'Golden Car',
+                'alamat'       => 'Jl. Raya Jati Mekar RT 001/RW 012 N0 24 Jati Asih, Bekasi',
+                'telepon'      => '085353112098',
+                'email'        => 'admin@golden-car.co.id',
+                'rekening'     => '1670009743047',
                 'logo'         => null, 
             ]);
         }
