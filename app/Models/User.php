@@ -22,10 +22,11 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(Panel $panel): bool
     {
-        if ($this->id === 1) return true;
+        // if ($this->id === 1) return true;
 
-        // Bisa akses jika punya role admin atau permission khusus
-        return $this->hasAnyRole(['admin', 'kasir', 'owner', 'mekanik']);
+        // // Bisa akses jika punya role admin atau permission khusus
+        // return $this->hasAnyRole(['admin', 'kasir', 'owner', 'mekanik']);
+        return $this->id === 1 || true;
     }
 
     protected $fillable = [

@@ -67,8 +67,7 @@ class PegawaiResource extends Resource
                             ->nullable(),
                     ])
                     ->searchable()
-                    ->preload()
-                    ->required(),
+                    ->preload(),
                 Select::make('jabatan_id')
                     ->label('Jabatan')
                     ->relationship('jabatan', 'nama_jabatan')
