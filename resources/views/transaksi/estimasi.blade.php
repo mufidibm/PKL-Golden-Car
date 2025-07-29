@@ -47,7 +47,9 @@
 <body>
     @php
         use Carbon\Carbon;
+        Carbon::setLocale('id');
         $tanggalFormatted = 'Bekasi, ' . Carbon::parse($transaksi->waktu_masuk)->translatedFormat('d F Y');
+        $ppnRate = 0.11; // Asumsi PPN 11%
     @endphp
     @if ($setting)
         <div style="display: flex; align-items: center; margin: 0; padding: 0 10px;">
@@ -122,7 +124,7 @@
             @endforeach
             @if ($transaksi->pengerjaanServis->flatMap->pengerjaanJasa->isEmpty())
                 <tr>
-                    <td colspan="3" style="text-align: center;">Belum ada jasa yang dipilih</td>
+                    <td colspan="4" style="text-align: center;">Belum ada jasa yang dipilih</td>
                 </tr>
             @endif
             <tr>
@@ -197,9 +199,28 @@
             <tr>
                 <td style="border: none;"></td>
                 <td style="border: none;"></td>
+                <td colspan="2" style="font-weight: bold;">PPN JASA</td>
+                <td class="text-right">
+                  @php $ppnJasa = $totalJasa * $ppnRate; @endphp
+                  <span style="float: left;">Rp</span> {{ number_format($ppnJasa, 0, ',', '.') }}
+                </td>
+              </tr>
+              <tr>
+                <td style="border: none;"></td>
+                <td style="border: none;"></td>
+                <td colspan="2" style="font-weight: bold;">PPN SPAREPART</td>;
+                <td class="text-right">
+                  @php $ppnSparepart = $totalSparepart * $ppnRate; @endphp
+                  <span style="float: left;">Rp</span> {{ number_format($ppnSparepart, 0, ',', '.') }}
+                </td>
+            </tr>
+            <tr>
+                <td style="border: none;"></td>
+                <td style="border: none;"></td>
                 <td colspan="2" style="font-weight: bold;">GRAND TOTAL</td>
                 <td class="text-right">
-                    <span style="float: left;">Rp</span> {{ number_format($totalJasa + $totalSparepart, 0, ',', '.') }}
+                    @php $grandTotal = $totalJasa + $ppnJasa + $totalSparepart + $ppnSparepart; @endphp
+                    <span style="float: left;">Rp</span> {{ number_format($grandTotal, 0, ',', '.') }}
                 </td>
             </tr>
         </tbody>
@@ -227,8 +248,7 @@
     </div>
     <script>
         window.onload = function () {
-            // Optional: Remove this if you don't want auto-print
-            // window.print();
+            window.print();
         };
     </script>
 </body>

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('pengerjaan_servis', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('transaksi_masuk_id');
-            $table->unsignedBigInteger('mekanik_id');
+            $table->unsignedBigInteger('mekanik_id')->nullable();
             $table->enum('status', [
                 'Waiting',
                 'Sedang Dikerjakan',

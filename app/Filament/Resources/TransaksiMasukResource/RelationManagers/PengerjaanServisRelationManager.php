@@ -32,8 +32,8 @@ class PengerjaanServisRelationManager extends RelationManager
         return $form->schema([
             Select::make('mekanik_id')
                 ->relationship('mekanik', 'nama')
-                ->searchable()
-                ->required(),
+                ->searchable(),
+                // ->required(),
 
             Select::make('status')
                 ->options([
