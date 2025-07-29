@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('transaksi_masuk_id');
             $table->unsignedBigInteger('mekanik_id')->nullable();
             $table->enum('status', [
-                'Waiting',
+                'Menunggu',
                 'Sedang Dikerjakan',
                 'Menunggu Sparepart',
                 'Pemeriksaan Akhir',

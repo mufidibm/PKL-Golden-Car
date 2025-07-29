@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>Estimasi Biaya Servis</title>
@@ -8,23 +9,29 @@
             font-family: Arial, sans-serif;
             margin: 20px;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
             font-size: 13px;
         }
-        th, td {
+
+        th,
+        td {
             border: 2.5px solid #000;
             padding: 4px;
             text-align: left;
         }
+
         .total {
             font-weight: bold;
         }
+
         .text-right {
             text-align: right;
         }
+
         .pengesahan {
             position: relative;
             top: 30px;
@@ -35,6 +42,7 @@
             margin: auto;
             font-size: 13px;
         }
+
         @media print {
             .pengesahan {
                 page-break-inside: avoid;
@@ -44,26 +52,34 @@
         }
     </style>
 </head>
+
 <body>
     @php
         use Carbon\Carbon;
         Carbon::setLocale('id');
         $tanggalFormatted = 'Bekasi, ' . Carbon::parse($transaksi->waktu_masuk)->translatedFormat('d F Y');
         $ppnRate = 0.11; // Asumsi PPN 11%
+
     @endphp
     @if ($setting)
         <div style="display: flex; align-items: center; margin: 0; padding: 0 10px;">
             <div style="max-width: 180px;">
                 @if ($setting->getFirstMediaUrl('logo'))
-                    <img src="{{ $setting->getFirstMediaUrl('logo') }}" alt="Logo" style="height: 60px; border-radius: 8px; margin-right: 20px; position: relative; bottom: -8px">
+                    <img src="{{ $setting->getFirstMediaUrl('logo') }}"
+                         alt="Logo"
+                         style="height: 60px; border-radius: 8px; margin-right: 20px; position: relative; bottom: -8px">
                 @endif
                 <div style="font-size: 13px; margin: 0;">{{ $setting->alamat ?? '-' }}</div>
             </div>
             <div style="position: absolute; width: 100%; text-align: center; justify-self: center;">
                 <h1 style="font-size: 20px; font-weight: bold; margin: 0;">ESTIMASI BIAYA SERVIS</h1>
+<h1 style="font-size: 20px; font-weight: bold; margin: 0;">
+    {{ $transaksi->kode_estimasi }}/GC/EST/{{ Carbon::parse($transaksi->waktu_masuk)->format('m/Y') }}
+</h1>
             </div>
         </div>
-        <div style="display: flex; justify-content: space-between; font-size: 13px; position: relative; bottom: -4px; padding: 0 10px; margin: 0;">
+        <div
+             style="display: flex; justify-content: space-between; font-size: 13px; position: relative; bottom: -4px; padding: 0 10px; margin: 0;">
             <p style="margin: 0;">{{ $setting->telepon ?? '-' }}</p>
             <p style="margin: 0;">{{ $tanggalFormatted }}</p>
         </div>
@@ -81,7 +97,9 @@
         </tr>
         <tr>
             <td style="padding: 4px; border: none;">Merk / Tipe Kendaraan</td>
-            <td style="padding: 4px; border: none;">:&nbsp;{{ $transaksi->kendaraan->merek ?? '-' }} / {{ $transaksi->kendaraan->tipe ?? '-' }}</td>
+            <td style="padding: 4px; border: none;">:&nbsp;{{ $transaksi->kendaraan->merek ?? '-' }} /
+                {{ $transaksi->kendaraan->tipe ?? '-' }}
+            </td>
         </tr>
         <tr>
             <td style="padding: 4px; border: none;">Warna</td>
@@ -111,25 +129,29 @@
             </tr>
         </thead>
         <tbody>
-            @php $i = 1; $totalJasa = 0; @endphp
-            @foreach ($transaksi->pengerjaanServis->flatMap->pengerjaanJasa as $item)
-                @php $totalJasa += $item->harga; @endphp
-                <tr>
-                    <td style="text-align: center;">{{ $i++ }}.</td>
-                    <td>{{ $item->jasa->nama_jasa }}</td>
-                    <td colspan="2" class="text-right">
-                        <span style="float: left;">Rp</span> {{ number_format($item->harga, 0, ',', '.') }}
-                    </td>
+            @php $i = 1;
+            $totalJasa = 0; @endphp
+        @foreach ($transaksi->pengerjaanServis->flatMap->pengerjaanJasa as $item)
+            @php $totalJasa += $item->harga; @endphp
+            <tr>
+                <td style="text-align: center;">{{ $i++ }}.</td>
+                <td>{{ $item->jasa->nama_jasa }}</td>
+                <td colspan="2"
+                    class="text-right">
+                    <span style="float: left;">Rp</span> {{ number_format($item->harga, 0, ',', '.') }}
+                </td>
                 </tr>
-            @endforeach
-            @if ($transaksi->pengerjaanServis->flatMap->pengerjaanJasa->isEmpty())
-                <tr>
-                    <td colspan="4" style="text-align: center;">Belum ada jasa yang dipilih</td>
+        @endforeach
+        @if ($transaksi->pengerjaanServis->flatMap->pengerjaanJasa->isEmpty())
+            <tr>
+                <td colspan="4"
+                    style="text-align: center;">Belum ada jasa yang dipilih</td>
                 </tr>
-            @endif
+        @endif
             <tr>
                 <td style="border: none;"></td>
-                <td colspan="2" style="font-weight: bold;">TOTAL</td>
+                <td colspan="2"
+                    style="font-weight: bold;">TOTAL</td>
                 <td class="text-right">
                     <span style="float: left;">Rp</span> {{ number_format($totalJasa, 0, ',', '.') }}
                 </td>
@@ -155,30 +177,35 @@
             </tr>
         </thead>
         <tbody>
-            @php $i = 1; $totalSparepart = 0; @endphp
-            @foreach ($transaksi->pengerjaanServis->flatMap->pengerjaanSparepart as $item)
-                @php $qty = $item->qty; $subtotal = $item->harga * $qty; $totalSparepart += $subtotal; @endphp
-                <tr>
-                    <td style="text-align: center;">{{ $i++ }}.</td>
-                    <td>{{ $item->barang->nama_barang }}</td>
-                    <td>{{ $qty }}</td>
-                    <td class="text-right">
-                        <span style="float: left;">Rp</span> {{ number_format($item->harga, 0, ',', '.') }}
-                    </td>
+            @php $i = 1;
+            $totalSparepart = 0; @endphp
+        @foreach ($transaksi->pengerjaanServis->flatMap->pengerjaanSparepart as $item)
+            @php $qty = $item->qty;
+                $subtotal = $item->harga * $qty;
+            $totalSparepart += $subtotal; @endphp
+            <tr>
+                <td style="text-align: center;">{{ $i++ }}.</td>
+                <td>{{ $item->barang->nama_barang }}</td>
+                <td>{{ $qty }}</td>
+                <td class="text-right">
+                    <span style="float: left;">Rp</span> {{ number_format($item->harga, 0, ',', '.') }}
+                </td>
                     <td class="text-right">
                         <span style="float: left;">Rp</span> {{ number_format($subtotal, 0, ',', '.') }}
-                    </td>
-                </tr>
-            @endforeach
-            @if ($transaksi->pengerjaanServis->flatMap->pengerjaanSparepart->isEmpty())
-                <tr>
-                    <td colspan="5" style="text-align: center;">Belum ada sparepart yang dipilih</td>
-                </tr>
-            @endif
+                </td>
+            </tr>
+        @endforeach
+        @if ($transaksi->pengerjaanServis->flatMap->pengerjaanSparepart->isEmpty())
+            <tr>
+                <td colspan="5"
+                    style="text-align: center;">Belum ada sparepart yang dipilih</td>
+            </tr>
+        @endif
             <tr>
                 <td style="border: none;"></td>
                 <td style="border: none;"></td>
-                <td colspan="2" style="font-weight: bold;">TOTAL</td>
+                <td colspan="2"
+                    style="font-weight: bold;">TOTAL</td>
                 <td class="text-right">
                     <span style="float: left;">Rp</span> {{ number_format($totalSparepart, 0, ',', '.') }}
                 </td>
@@ -199,25 +226,28 @@
             <tr>
                 <td style="border: none;"></td>
                 <td style="border: none;"></td>
-                <td colspan="2" style="font-weight: bold;">PPN JASA</td>
+                <td colspan="2"
+                    style="font-weight: bold;">PPN JASA</td>
                 <td class="text-right">
-                  @php $ppnJasa = $totalJasa * $ppnRate; @endphp
-                  <span style="float: left;">Rp</span> {{ number_format($ppnJasa, 0, ',', '.') }}
-                </td>
-              </tr>
-              <tr>
-                <td style="border: none;"></td>
-                <td style="border: none;"></td>
-                <td colspan="2" style="font-weight: bold;">PPN SPAREPART</td>;
-                <td class="text-right">
-                  @php $ppnSparepart = $totalSparepart * $ppnRate; @endphp
-                  <span style="float: left;">Rp</span> {{ number_format($ppnSparepart, 0, ',', '.') }}
+                    @php $ppnJasa = $totalJasa * $ppnRate; @endphp
+                    <span style="float: left;">Rp</span> {{ number_format($ppnJasa, 0, ',', '.') }}
                 </td>
             </tr>
             <tr>
                 <td style="border: none;"></td>
                 <td style="border: none;"></td>
-                <td colspan="2" style="font-weight: bold;">GRAND TOTAL</td>
+                <td colspan="2"
+                    style="font-weight: bold;">PPN SPAREPART</td>;
+                <td class="text-right">
+                    @php $ppnSparepart = $totalSparepart * $ppnRate; @endphp
+                    <span style="float: left;">Rp</span> {{ number_format($ppnSparepart, 0, ',', '.') }}
+                </td>
+            </tr>
+            <tr>
+                <td style="border: none;"></td>
+                <td style="border: none;"></td>
+                <td colspan="2"
+                    style="font-weight: bold;">GRAND TOTAL</td>
                 <td class="text-right">
                     @php $grandTotal = $totalJasa + $ppnJasa + $totalSparepart + $ppnSparepart; @endphp
                     <span style="float: left;">Rp</span> {{ number_format($grandTotal, 0, ',', '.') }}
@@ -252,4 +282,5 @@
         };
     </script>
 </body>
+
 </html>

@@ -16,6 +16,7 @@ class TransaksiMasuk extends Model
         'waktu_masuk',
         'estimasi_biaya',
         'keluhan',
+        'kode_estimasi',
     ];
 
     public function kendaraan()

@@ -40,6 +40,13 @@ class TransaksiMasukResource extends Resource
                     ->required()
                     ->searchable(),
 
+                TextInput::make('kode_estimasi')
+                    ->label('Kode Estimasi')
+                    ->placeholder('Contoh: 001')
+                    ->required()
+                    ->maxLength(50),
+
+
                 Select::make('asuransi_id')
                     ->label('Jenis Asuransi')
                     ->relationship('asuransi', 'nama')
@@ -79,6 +86,10 @@ class TransaksiMasukResource extends Resource
                 TextColumn::make('kendaraan.no_polisi')
                     ->label('No Polisi')
                     ->searchable(),
+                TextColumn::make('kode_estimasi')
+                    ->label('Kode Estimasi')
+                    ->searchable(),
+
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {

@@ -62,6 +62,13 @@ class PembayaranResource extends Resource
                     ->label('Metode Pembayaran')
                     ->relationship('metodePembayaran', 'nama_metode')
                     ->required(),
+
+                TextInput::make('kode_invoice')
+                    ->label('Kode Invoice')
+                    ->required()
+                    ->placeholder('Contoh: 001')
+                    ->maxLength(100),
+
             ]),
 
             Grid::make(3)->schema([

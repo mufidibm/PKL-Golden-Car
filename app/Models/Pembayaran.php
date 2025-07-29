@@ -13,6 +13,7 @@ class Pembayaran extends Model
         'id_transaksi_masuk',
         'metode_pembayaran_id',
         'total_bayar',
+        'kode_invoice',
         'dibayar',
         'kembalian',
         'kasir_id',

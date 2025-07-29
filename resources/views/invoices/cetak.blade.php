@@ -98,6 +98,7 @@
             </div>
             <div style="position: absolute; width: 100%; text-align: center; justify-self: center;">
                 <h1 style="font-size: 20px; font-weight: bold; margin: 0;">INVOICE KENDARAAN</h1>
+                <h1 style="font-size: 20px; font-weight: bold; margin: 0;">{{ $Pembayaran->kode_invoice }}/GC/INV/{{ Carbon::parse($Pembayaran->created_at)->format('m/Y') }}</h1>
             </div>
         </div>
         <div
@@ -287,17 +288,11 @@
             <p style="margin: 0;">{{ $tanggalFormatted }} <br>
                 Hormat kami
                 <br><br><br><br><br>
-                Endang Sandirosa <br>
-                Service Advisor
+                 <br>
+                Finance
             </p>
         </div>
         <div class="sah-kanan">
-            <br>
-            <p style="margin: 0;">Mengetahui
-                <br><br><br><br><br>
-                Ramma Krismawandi <br>
-                Kepala Bengkel
-            </p>
         </div>
     </div>
 </body>
