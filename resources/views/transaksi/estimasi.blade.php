@@ -223,33 +223,14 @@
                 <td style="border: none;"></td>
                 <td style="border: none;"></td>
             </tr>
-            <tr>
-                <td style="border: none;"></td>
-                <td style="border: none;"></td>
-                <td colspan="2"
-                    style="font-weight: bold;">PPN JASA</td>
-                <td class="text-right">
-                    @php $ppnJasa = $totalJasa * $ppnRate; @endphp
-                    <span style="float: left;">Rp</span> {{ number_format($ppnJasa, 0, ',', '.') }}
-                </td>
-            </tr>
-            <tr>
-                <td style="border: none;"></td>
-                <td style="border: none;"></td>
-                <td colspan="2"
-                    style="font-weight: bold;">PPN SPAREPART</td>;
-                <td class="text-right">
-                    @php $ppnSparepart = $totalSparepart * $ppnRate; @endphp
-                    <span style="float: left;">Rp</span> {{ number_format($ppnSparepart, 0, ',', '.') }}
-                </td>
-            </tr>
+            
             <tr>
                 <td style="border: none;"></td>
                 <td style="border: none;"></td>
                 <td colspan="2"
                     style="font-weight: bold;">GRAND TOTAL</td>
                 <td class="text-right">
-                    @php $grandTotal = $totalJasa + $ppnJasa + $totalSparepart + $ppnSparepart; @endphp
+                    @php $grandTotal = $totalJasa + $totalSparepart; @endphp
                     <span style="float: left;">Rp</span> {{ number_format($grandTotal, 0, ',', '.') }}
                 </td>
             </tr>
