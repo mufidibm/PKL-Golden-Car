@@ -43,7 +43,7 @@ class CustomerResource extends Resource
                         'Perempuan' => 'Perempuan',
                     ])->required(),
                 TextInput::make('no_hp')->required(),
-                Textarea::make('alamat')->required()
+                Textarea::make('alamat')
             ]);
     }
 

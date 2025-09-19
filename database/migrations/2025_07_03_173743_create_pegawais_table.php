@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('no_hp')->nullable();
             $table->string('email')->unique()->nullable();
             $table->enum('status_kepegawaian', ['aktif', 'tidak'])->default('aktif');
-            $table->foreignId('departemen_id')->constrained('departemens')->onDelete('cascade');
+            $table->foreignId('departemen_id')->nullable()->constrained('departemens')->onDelete('cascade');
             $table->foreignId('jabatan_id')->constrained('jabatans')->onDelete('cascade');
             $table->timestamps();
         });

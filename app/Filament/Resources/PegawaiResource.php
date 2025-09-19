@@ -156,7 +156,7 @@ class PegawaiResource extends Resource
     }
 
     public static function canViewAny(): bool
-    {
+{
         $user = auth()->user();
         if ($user && $user->id === 1) return true;
         return $user && ($user->hasRole('admin') || $user->can('kepegawaian'));

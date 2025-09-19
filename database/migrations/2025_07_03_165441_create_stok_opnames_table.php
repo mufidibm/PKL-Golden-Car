@@ -13,13 +13,18 @@ return new class extends Migration
     {
         Schema::create('stok_opnames', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('barang_id')->constrained()->onDelete('cascade');
+            $table->enum('jenis_inventory', ['barang', 'stok']);
+            $table->unsignedBigInteger('item_id');
             $table->integer('stok_lama');
             $table->integer('stok_baru');
             $table->integer('selisih')->nullable();
             $table->text('keterangan')->nullable();
-            $table->timestamp('tanggal_opname')->useCurrent();
+            $table->date('tanggal_opname');
             $table->timestamps();
+
+            // Index untuk performa
+            $table->index(['jenis_inventory', 'item_id']);
+            $table->index('tanggal_opname');
         });
     }
 

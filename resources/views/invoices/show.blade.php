@@ -80,7 +80,7 @@
             $totalSparepart += $item->subtotal;
             if (session('gunakan_ppn_sparepart', false)) {
                 $ppnSparepart += 0.11 * $item->subtotal;
-        }
+            }
         }
 
         $tanggalFormatted = 'Bekasi, ' . Carbon::parse($Pembayaran->created_at)->translatedFormat('d F Y');
@@ -89,16 +89,19 @@
     @if ($setting)
         <div style="display: flex; align-items: center; margin: 0; padding: 0 10px;">
             <div style="max-width: 180px;">
-                @if ($setting->getFirstMediaUrl('logo'))
-                    <img src="{{ $setting->getFirstMediaUrl('logo') }}"
+                @if ($setting->logo)
+                    <img src="{{ asset('storage/' . $setting->logo) }}"
                          alt="Logo"
                          style="height: 60px; border-radius: 8px; margin-right: 20px; position: relative; bottom: -8px">
                 @endif
+
                 <div style="font-size: 13px; margin: 0;">{{ $setting->alamat ?? '-' }}</div>
             </div>
             <div style="position: absolute; width: 100%; text-align: center; justify-self: center;">
                 <h1 style="font-size: 20px; font-weight: bold; margin: 0;">INVOICE KENDARAAN</h1>
-                <h1 style="font-size: 20px; font-weight: bold; margin: 0;">{{ $Pembayaran->kode_invoice }}/GC/INV/{{ Carbon::parse($Pembayaran->created_at)->format('m/Y') }}</h1>
+                <h1 style="font-size: 20px; font-weight: bold; margin: 0;">
+                    {{ $Pembayaran->kode_invoice }}/GC/INV/{{ Carbon::parse($Pembayaran->created_at)->format('m/Y') }}
+                </h1>
             </div>
         </div>
         <div
@@ -280,7 +283,8 @@
         </tbody>
     </table>
     <p style="font-size: 13px">Demikian invoice ini kami sampaikan atas perhatian dan kerjasamanya kami ucapkan,
-        <br>terimakasih.</p>
+        <br>terimakasih.
+    </p>
     <p style="margin: 0; font-size:13px">No Rekening Kami: {{ $setting->rekening ?? '-' }}</p>
 
     <div class="pengesahan">
@@ -288,7 +292,7 @@
             <p style="margin: 0;">{{ $tanggalFormatted }} <br>
                 Hormat kami
                 <br><br><br><br><br>
-                 <br>
+                <br>
                 Finance
             </p>
         </div>

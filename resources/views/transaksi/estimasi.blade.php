@@ -64,8 +64,8 @@
     @if ($setting)
         <div style="display: flex; align-items: center; margin: 0; padding: 0 10px;">
             <div style="max-width: 180px;">
-                @if ($setting->getFirstMediaUrl('logo'))
-                    <img src="{{ $setting->getFirstMediaUrl('logo') }}"
+                @if ($setting->logo)
+                    <img src="{{ asset('storage/' . $setting->logo) }}"
                          alt="Logo"
                          style="height: 60px; border-radius: 8px; margin-right: 20px; position: relative; bottom: -8px">
                 @endif

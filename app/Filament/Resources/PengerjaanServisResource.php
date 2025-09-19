@@ -293,9 +293,15 @@ class PengerjaanServisResource extends Resource
     public static function getRelations(): array
     {
         return [
-           PengerjaanSparepartRelationManager::class,
+            PengerjaanSparepartRelationManager::class,
         ];
     }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
 
     public static function getPages(): array
     {

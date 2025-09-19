@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PengaturanResource\Pages;
 use App\Models\Setting;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -35,15 +36,11 @@ class PengaturanResource extends Resource
             TextInput::make('email')->email(),
             TextInput::make('rekening'),
 
-            SpatieMediaLibraryFileUpload::make('logo')
-                ->collection('logo')
-                ->disk('public')
-                ->directory('logo') 
-                ->image()
-                ->preserveFilenames()
-                ->imageEditor()
-                ->loadingIndicatorPosition('left')
-                ->panelAspectRatio('1:1'),
+            FileUpload::make('logo')
+                ->disk('public') // simpan di storage/app/public
+                ->directory('logos') // folder di dalam public disk
+                ->visibility('public')
+
         ]);
     }
 
