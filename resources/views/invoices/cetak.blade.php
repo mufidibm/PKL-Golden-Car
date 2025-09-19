@@ -282,14 +282,14 @@
         </tbody>
     </table>
     <p style="font-size: 13px">Demikian invoice ini kami sampaikan atas perhatian dan kerjasamanya kami ucapkan,
-        <br>terimakasih.
-    </p>
-    <p style="margin: 0; font-size:13px">No Rekening Kami: {{ $setting->rekening ?? '-' }}</p>
+        <br>terimakasih.</p>
+    <p style="margin: 0; font-size:13px">No Rekening : Mandiri {{ $setting->rekening ?? '-' }}</p>
+    <p style="margin: 0; font-size:13px">PT Athaditya Inti Multikreasi</p>
 
     <div class="pengesahan">
         <div class="sah-kiri">
             <p style="margin: 0;">{{ $tanggalFormatted }} <br>
-                Hormat kami
+                Hormat Kami
                 <br><br><br><br><br>
                 <br>
                 Finance
