@@ -21,22 +21,18 @@ class EditPengaturan extends EditRecord
         ];
     }
 
-protected function getFormSchema(): array
-{
-    return [
-        TextInput::make('nama_bengkel')->label('Nama Bengkel')->required(),
-        Textarea::make('alamat')->label('Alamat')->required(),
-        TextInput::make('telepon')->label('No. Telepon')->required(),
-        TextInput::make('email')->label('Email')->email(),
-        TextInput::make('rekening')->label('Rekening')->required(),
-        SpatieMediaLibraryFileUpload::make('logo')
-            ->label('Logo')
-            ->collection('logo')
-            ->disk('public')
-            ->directory('logo')
-            ->image()
-            ->imageEditor()
-            ->preserveFilenames(),
-    ];
-}
+    protected function getFormSchema(): array
+    {
+        return [
+            TextInput::make('nama_bengkel')->label('Nama Bengkel')->required(),
+            Textarea::make('alamat')->label('Alamat')->required(),
+            TextInput::make('telepon')->label('No. Telepon')->required(),
+            TextInput::make('email')->label('Email')->email(),
+            TextInput::make('rekening')->label('Rekening')->required(),
+            FileUpload::make('logo')
+                ->disk('public') // simpan di storage/app/public
+                ->directory('logos') // folder di dalam public disk
+                ->visibility('public')
+        ];
+    }
 }

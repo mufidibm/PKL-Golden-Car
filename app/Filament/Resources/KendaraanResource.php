@@ -38,6 +38,7 @@ class KendaraanResource extends Resource
                     ->label('Customer')
                     ->relationship('customer', 'nama') 
                     ->searchable()
+                    ->required()
                     ->preload()
                     ->createOptionForm([
                         Forms\Components\TextInput::make('nama')->required(),
@@ -48,13 +49,13 @@ class KendaraanResource extends Resource
                             ])
                             ->required(),
                         Forms\Components\TextInput::make('no_hp')->required(),
-                        Forms\Components\Textarea::make('alamat')->required(),
+                        Forms\Components\Textarea::make('alamat'),
                     ]),
 
                 TextInput::make('no_polisi')->required()->unique(ignoreRecord: true),
                 TextInput::make('tipe')->required(),
                 TextInput::make('merek')->required(),
-                TextInput::make('tahun')->numeric()->minValue(1980)->maxValue(date('Y')),
+                TextInput::make('tahun')->numeric()->minValue(1980)->maxValue(date('Y'))->required(),
                 TextInput::make('warna')->required(),
                 TextInput::make('jenis_kendaraan')->required(),
             ]);

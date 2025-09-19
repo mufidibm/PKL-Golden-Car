@@ -225,6 +225,12 @@ class PembayaranResource extends Resource
         ];
     }
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
+
     public static function canViewAny(): bool
     {
         $user = auth()->user();

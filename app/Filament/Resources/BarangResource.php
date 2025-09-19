@@ -21,28 +21,26 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class BarangResource extends Resource
 {
     protected static ?string $model = Barang::class;
+    protected static ?int $navigationSort = 1;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationGroup = 'Manajemen Inventory';
 
-    protected static ?string $label = 'Master Barang';
-    protected static ?string $pluralLabel = 'Master Barang';
+    protected static ?string $label = 'Master Sparepart';
+    protected static ?string $pluralLabel = 'Master Sparepart';
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                TextInput::make('kode_barang')->required()->unique(ignoreRecord: true),
-                TextInput::make('nama_barang')->required(),
-                Select::make('kategori')
-                    ->options([
-                        'Sparepart' => 'Sparepart',
-                        'Bahan Paint' => 'Bahan Paint',
-                        'Bahan Non Paint' => 'Bahan Non Paint',
-                        'Tools' => 'Tools'
-                    ])
-                    ->required(),
+                TextInput::make('kode_barang')->label('Kode Sparepart')->required()->unique(ignoreRecord: true),
+                TextInput::make('nama_barang')->label('Nama Sparepart')->required(),
                 TextInput::make('satuan')->required(),
                 TextInput::make('stok')->numeric()->default(0),
                 TextInput::make('harga_beli')->numeric()->required(),
@@ -55,27 +53,21 @@ class BarangResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('kode_barang')->searchable()->sortable(),
-                TextColumn::make('nama_barang')->searchable()->sortable(),
-                TextColumn::make('kategori')->sortable(),
+                TextColumn::make('kode_barang')->label('Kode Sparepart')->searchable()->sortable(),
+                TextColumn::make('nama_barang')->label('Nama Sparepart')->searchable()->sortable(),
                 TextColumn::make('stok')->sortable(),
                 TextColumn::make('harga_jual')->money('IDR')->sortable(),
             ])
-            ->filters([
-                SelectFilter::make('kategori')
-                    ->options([
-                        'Sparepart' => 'Sparepart',
-                        'Bahan Paint' => 'Bahan Paint',
-                        'Bahan Non Paint' => 'Bahan Non Paint',
-                        'Tools' => 'Tools'
-                    ])
-            ])
+            ->filters([])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->requiresConfirmation(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->requiresConfirmation(),
                 ]),
             ])
             ->emptyStateActions([
