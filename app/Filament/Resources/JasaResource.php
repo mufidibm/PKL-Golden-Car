@@ -23,7 +23,7 @@ class JasaResource extends Resource
 
     public static function form(Form $form): Form
     {
-        
+
         return $form
             ->schema([
                 Forms\Components\Section::make('Informasi Jasa')
@@ -129,4 +129,10 @@ class JasaResource extends Resource
         return static::getModel()::count();
     }
 
+    public static function canViewAny(): bool
+    {
+        $user = auth()->user();
+        if ($user && $user->id === 1) return true;
+        return $user && ($user->hasRole('admin') || $user->can('manajemen inventory'));
+    }
 }

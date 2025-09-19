@@ -43,8 +43,11 @@ class TransaksiMasukResource extends Resource
                 TextInput::make('kode_estimasi')
                     ->label('Kode Estimasi')
                     ->placeholder('Contoh: 001')
-                    ->required()
                     ->maxLength(50),
+
+                    //untuk unik 
+                    // ->unique(TransaksiMasuk::class, 'kode_estimasi', ignoreRecord: true)
+                    // ->helperText('Kode estimasi harus unik dan belum pernah digunakan'),
 
 
                 Select::make('asuransi_id')
@@ -64,6 +67,7 @@ class TransaksiMasukResource extends Resource
                         'pemeriksaan akhir' => 'Pemeriksaan Akhir',
                         'selesai' => 'Selesai',
                     ])
+                    ->required()
                     ->default('menunggu'),
 
                 TextInput::make('keluhan')
@@ -72,6 +76,7 @@ class TransaksiMasukResource extends Resource
 
                 DatePicker::make('waktu_masuk')
                     ->label('Tanggal Masuk')
+                    ->required()
                     ->default(now()),
             ]);
     }

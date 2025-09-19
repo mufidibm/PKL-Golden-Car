@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('kendaraan_id')->constrained()->cascadeOnDelete();
             $table->enum('status', ['menunggu', 'sedang dikerjakan', 'menunggu sparepart', 'pemeriksaan akhir', 'selesai'])->default('menunggu');
-            $table->timestamp('waktu_masuk')->default(now());
+            $table->date('waktu_masuk')->default(now());
             $table->text('keluhan')->nullable();
             $table->timestamps();
         });

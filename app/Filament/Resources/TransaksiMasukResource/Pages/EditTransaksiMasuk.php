@@ -34,7 +34,7 @@ class EditTransaksiMasuk extends EditRecord
         $pengerjaanList = $record->pengerjaanServis()
             ->with(['spareparts.barang', 'pegawai', 'jasas.jasa'])
             ->get();
-            
+
 
         return view('filament.resources.transaksi-masuk.custom-pengerjaan', [
             'pengerjaanList' => $pengerjaanList,
@@ -48,7 +48,7 @@ class EditTransaksiMasuk extends EditRecord
 
         if (session('success')) {
             Notification::make()
-                ->title(session('success'))
+                ->title('Data transaksi berhasil diperbarui!')
                 ->success()
                 ->send();
         }

@@ -17,7 +17,7 @@ class Setting extends Model implements HasMedia
         'telepon',
         'email',
         'rekening',
-        
+        'logo'
     ];
 }
 

@@ -45,7 +45,7 @@ class PengerjaanServisRelationManager extends RelationManager
                 ])
                 ->required(),
 
-            DateTimePicker::make('mulai')->required(),
+            DateTimePicker::make('mulai')->required()->default(now())->timezone('Asia/Jakarta'),
             DateTimePicker::make('selesai')->nullable(),
             Textarea::make('catatan')->label('Catatan')->nullable(),
         ]);
@@ -63,13 +63,6 @@ class PengerjaanServisRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make(),
-                // Tambahkan aksi untuk melihat estimasi
-                // Action::make('lihat_estimasi')
-                //     ->label('Lihat Estimasi')
-                //     ->icon('heroicon-o-document-text')
-                //     ->color('info')
-                //     ->url(fn() => route('transaksi.estimasi', $this->ownerRecord->id))
-                //     ->openUrlInNewTab(),
             ])
             ->actions([
                 EditAction::make(),
@@ -132,10 +125,15 @@ class PengerjaanServisRelationManager extends RelationManager
                             ->createItemButtonLabel('Tambah'),
                     ])
                     ->action(function (array $data, $record) {
+                        $hasError = false;
+                        $successCount = 0;
+                        
                         foreach ($data['items'] as $item) {
                             $barang = Barang::find($item['barang_id']);
 
+                            // Validasi stok
                             if (! $barang || $barang->stok < $item['qty']) {
+                                $hasError = true;
                                 Notification::make()
                                     ->title('Gagal Menambahkan')
                                     ->body("Stok {$barang->nama_barang} tidak mencukupi.")
@@ -144,6 +142,7 @@ class PengerjaanServisRelationManager extends RelationManager
                                 continue;
                             }
 
+                            // Jika validasi lolos, tambahkan sparepart
                             PengerjaanSparepart::create([
                                 'pengerjaan_servis_id' => $record->id,
                                 'barang_id' => $item['barang_id'],
@@ -152,23 +151,30 @@ class PengerjaanServisRelationManager extends RelationManager
                                 'subtotal' => $item['subtotal'],
                             ]);
 
+                            $successCount++;
                             // $barang->decrement('stok', $item['qty']);
                         }
                         
-                        // Notification dengan link estimasi setelah menambah sparepart
-                        Notification::make()
-                            ->title('Sparepart berhasil ditambahkan')
-                            ->body('Klik untuk melihat estimasi terbaru')
-                            ->success()
-                            ->actions([
-                                \Filament\Notifications\Actions\Action::make('lihat_estimasi')
-                                    ->button()
-                                    ->url(route('transaksi.estimasi', $this->ownerRecord->id))
-                                    ->openUrlInNewTab()
-                                    ->label('Lihat Estimasi'),
-                            ])
-                            ->send();
-                    }),
+                        // Hanya tampilkan notif sukses jika ada yang berhasil ditambahkan
+                        if ($successCount > 0) {
+                            Notification::make()
+                                ->title('Sparepart berhasil ditambahkan')
+                                ->body('Klik untuk melihat estimasi terbaru')
+                                ->success()
+                                ->actions([
+                                    \Filament\Notifications\Actions\Action::make('lihat_estimasi')
+                                        ->button()
+                                        ->url(route('transaksi.estimasi', $this->ownerRecord->id))
+                                        ->openUrlInNewTab()
+                                        ->label('Lihat Estimasi'),
+                                ])
+                                ->send();
+                            
+                            // Refresh halaman untuk menampilkan data terbaru
+                            $this->dispatch('refresh');
+                        }
+                    })
+                    ->after(fn() => $this->dispatch('refresh')), // Refresh setelah action selesai
 
                 Action::make('tambah_jasa')
                     ->label('Tambah Jasa')
@@ -226,15 +232,11 @@ class PengerjaanServisRelationManager extends RelationManager
                                     ->label('Lihat Estimasi'),
                             ])
                             ->send();
-                    }),
-                    
-                // Tambahkan aksi untuk melihat estimasi di setiap row
-                // Action::make('lihat_estimasi')
-                //     ->label('Estimasi')
-                //     ->icon('heroicon-o-document-text')
-                //     ->color('info')
-                //     ->url(fn($record) => route('transaksi.estimasi', $this->ownerRecord->id))
-                //     ->openUrlInNewTab(),
+                            
+                        // Refresh halaman untuk menampilkan data terbaru
+                        $this->dispatch('refresh');
+                    })
+                    ->after(fn() => $this->dispatch('refresh')), // Refresh setelah action selesai
             ]);
     }
 }

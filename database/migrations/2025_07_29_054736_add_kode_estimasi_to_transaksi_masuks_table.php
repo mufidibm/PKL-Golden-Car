@@ -14,6 +14,7 @@ return new class extends Migration
     {
         Schema::table('transaksi_masuk', function (Blueprint $table) {
             $table->string('kode_estimasi')->nullable();
+            // $table->string('kode_estimasi')->nullable()->unique();
         });
     }
 
